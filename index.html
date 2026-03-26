@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v56.64</title>
-    <link rel="manifest" href="manifest.json">
+    <title>Vigilancia Móvil v56.66</title>
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -25,23 +25,23 @@
         <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-emerald-500">
             <div class="bg-indigo-900 p-8 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-2xl font-black uppercase italic tracking-tighter">Vigilancia Móvil</h1>
-                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 italic">v56.64 • MODO PWA OFFLINE</p>
+                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 italic">v56.66 • REFUERZO OFFLINE</p>
             </div>
             <div class="p-8 space-y-6">
                 <div class="p-4 bg-red-50 rounded-2xl border-2 border-red-100">
                     <h3 class="text-[12px] font-black text-red-700 uppercase mb-2 text-center">🛑 AVISO LEGAL</h3>
                     <p class="text-[10px] text-red-900 leading-tight italic text-justify">
-                        Esta aplicación es una herramienta de apoyo a la decisión clínica. Toda información proporcionada es responsabilidad exclusiva del médico tratante. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio profesional. La información no sustituye la consulta médica ni el criterio del especialista.
+                        Esta aplicación es una herramienta de apoyo a la decisión clínica. Toda información proporcionada es responsabilidad exclusiva del médico tratante. La información no sustituye la consulta médica ni el criterio del especialista.
                     </p>
                 </div>
-                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">INGRESAR</button>
+                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ENTRAR</button>
             </div>
         </div>
     </div>
 
     <header class="bg-indigo-950 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.64</h1>
-        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Sin Datos</div>
+        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.66</h1>
+        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Cargando...</div>
     </header>
 
     <main class="p-4 space-y-6">
@@ -57,11 +57,11 @@
                     <input type="file" id="csvInts" accept=".csv" class="text-[7px] w-full">
                 </div>
             </div>
-            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg">Actualizar y Guardar en Memoria</button>
+            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg italic">Sincronizar Datos</button>
         </section>
 
         <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200">
-            <h2 class="text-[10px] font-black text-indigo-900 uppercase mb-3 italic">2. Paciente</h2>
+            <h2 class="text-[10px] font-black text-indigo-900 uppercase mb-3 italic">2. Datos de Paciente</h2>
             <input type="text" id="pNombre" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3 text-sm font-black uppercase outline-none mb-3" placeholder="Nombre completo">
             <div class="flex gap-2">
                 <input type="number" id="pEdad" class="w-1/2 bg-slate-100 border-2 border-slate-200 rounded-xl p-3 text-sm font-black" placeholder="Edad">
@@ -72,7 +72,7 @@
         <section class="space-y-4 relative">
             <div class="flex justify-between items-center px-1">
                 <div class="flex items-center">
-                    <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripción</h2>
+                    <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripción Actual</h2>
                     <span id="medCount" class="badge-count">0</span>
                 </div>
                 <button onclick="limpiarTodo()" class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase shadow-md">Limpiar</button>
@@ -86,15 +86,15 @@
 
         <div id="resultados" class="hidden space-y-4 pb-24">
             <div id="alertaTriple" class="hidden"></div>
-            <div class="bg-white rounded-3xl p-5 border-l-8 border-orange-500 shadow-lg">
+            <div id="boxDup" class="bg-white rounded-3xl p-5 border-l-8 border-orange-500 shadow-lg hidden">
                 <h3 class="text-orange-600 font-black text-[10px] uppercase mb-3 italic">⚠️ Duplicidad Terapéutica</h3>
                 <div id="resDup" class="text-xs space-y-2 font-bold"></div>
             </div>
-            <div class="bg-white rounded-3xl p-5 border-l-8 border-red-600 shadow-lg">
+            <div id="boxInt" class="bg-white rounded-3xl p-5 border-l-8 border-red-600 shadow-lg hidden">
                 <h3 class="text-red-600 font-black text-[10px] uppercase mb-3 italic">🛑 Interacciones Medicamentosas</h3>
                 <div id="resInt" class="text-xs space-y-4 font-medium"></div>
             </div>
-            <div class="bg-white rounded-3xl p-5 border-l-8 border-blue-600 shadow-lg">
+            <div id="boxBeers" class="bg-white rounded-3xl p-5 border-l-8 border-blue-600 shadow-lg hidden">
                 <h3 class="text-blue-600 font-black text-[10px] uppercase mb-3 italic">📘 Criterios de Beers 2023</h3>
                 <div id="resBeers" class="text-xs space-y-4 font-medium"></div>
             </div>
@@ -110,43 +110,35 @@
         let DB_MEDS = []; let DB_RULES = []; let seleccionados = [];
         let final_dup = []; let final_int = []; let final_beers = []; let flagTriple = false; let flagTripleMeds = "";
 
-        // Al iniciar, intentar cargar de la memoria del navegador
+        // 1. REGISTRO DE SERVICE WORKER (Reforzado para S25 Ultra)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => {
+                    console.log('SW activo');
+                    reg.update(); // Forzar búsqueda de actualizaciones
+                })
+                .catch(err => console.log('Error SW:', err));
+            });
+        }
+
+        // Cargar datos locales al iniciar
         window.onload = () => {
-            const storedMeds = localStorage.getItem('pwa_meds');
-            const storedRules = localStorage.getItem('pwa_rules');
-            if(storedMeds && storedRules) {
-                DB_MEDS = JSON.parse(storedMeds);
-                DB_RULES = JSON.parse(storedRules);
+            const m = localStorage.getItem('pwa_meds');
+            const r = localStorage.getItem('pwa_rules');
+            if(m && r) {
+                DB_MEDS = JSON.parse(m);
+                DB_RULES = JSON.parse(r);
                 actualizarEstadoUI();
-            }
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js');
+            } else {
+                document.getElementById('status').innerText = "Sin Datos";
             }
         };
 
         function actualizarEstadoUI() {
-            const status = document.getElementById('status');
-            status.innerText = `${DB_RULES.length} Reglas Listas`;
-            status.className = "sync-status bg-emerald-500 text-white";
-        }
-
-        const weight = (act) => {
-            const a = act.toUpperCase();
-            if(a.includes("EVITAR")) return 3;
-            if(a.includes("PRECAUCION")) return 2;
-            return 1;
-        };
-
-        function limpiarTodo() {
-            if(confirm("¿Limpiar expediente actual?")) {
-                seleccionados = []; 
-                document.getElementById('pNombre').value = "";
-                document.getElementById('pEdad').value = "";
-                document.getElementById('pPeso').value = "";
-                document.getElementById('resultados').classList.add('hidden');
-                document.getElementById('btnPdf').classList.add('hidden');
-                renderUI();
-            }
+            const s = document.getElementById('status');
+            s.innerText = `${DB_RULES.length} Reglas Listas`;
+            s.className = "sync-status bg-emerald-500 text-white";
         }
 
         function readFile(file) {
@@ -161,8 +153,7 @@
         async function procesarArchivos() {
             const fM = document.getElementById('csvMeds').files[0];
             const fI = document.getElementById('csvInts').files[0];
-            if(!fM || !fI) return alert("Seleccione ambos archivos CSV.");
-            
+            if(!fM || !fI) return alert("Cargue ambos archivos CSV.");
             try {
                 const tM = await readFile(fM);
                 const lM = tM.split(/\r?\n/).filter(l => l.trim() !== "");
@@ -174,7 +165,7 @@
                         const name = c[0].toUpperCase();
                         if (name === "GENERICO" || name === "NOMBRE") return;
                         const norm = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                        DB_MEDS.push({ name: name, norm: norm, atc: c[1].toUpperCase() });
+                        DB_MEDS.push({ name, norm, atc: c[1].toUpperCase() });
                     }
                 });
 
@@ -190,12 +181,11 @@
                     }
                 });
 
-                // GUARDAR EN MEMORIA LOCAL
                 localStorage.setItem('pwa_meds', JSON.stringify(DB_MEDS));
                 localStorage.setItem('pwa_rules', JSON.stringify(DB_RULES));
                 actualizarEstadoUI();
-                alert("Bases guardadas. Ya puedes usar la app sin volver a cargarlas.");
-            } catch(e) { alert("Error de carga."); }
+                alert("Bases guardadas localmente.");
+            } catch(e) { alert("Error de lectura."); }
         }
 
         function handleSearch(val) {
@@ -223,41 +213,63 @@
             document.getElementById('medCount').innerText = seleccionados.length;
             cont.innerHTML = seleccionados.map((f, i) => `
                 <div class="med-row">
-                    <div class="med-info"><span class="med-name">${f.name}</span><br><span class="med-atc">${f.atc}</span></div>
-                    <button onclick="seleccionados.splice(${i},1); renderUI()" class="btn-del">
+                    <div class="med-info"><span class="med-name">${f.name}</span><br><span class="med-atc font-mono text-[10px] text-emerald-600">${f.atc}</span></div>
+                    <button onclick="seleccionados.splice(${i},1); renderUI()" class="text-red-500 p-2">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
                 </div>`).join('');
         }
 
+        function limpiarTodo() {
+            if(confirm("¿Limpiar todo?")) {
+                seleccionados = []; 
+                document.getElementById('pNombre').value = "";
+                document.getElementById('pEdad').value = "";
+                document.getElementById('pPeso').value = "";
+                document.getElementById('resultados').classList.add('hidden');
+                document.getElementById('btnPdf').classList.add('hidden');
+                renderUI();
+            }
+        }
+
         function ejecutarAnalisis() {
             if(seleccionados.length < 1) return;
-            document.getElementById('resultados').classList.remove('hidden');
+            const resArea = document.getElementById('resultados');
+            resArea.classList.remove('hidden');
+            
             const rD = document.getElementById('resDup'); rD.innerHTML = "";
             const rI = document.getElementById('resInt'); rI.innerHTML = "";
             const rB = document.getElementById('resBeers'); rB.innerHTML = "";
             const aT = document.getElementById('alertaTriple'); aT.classList.add('hidden');
             
-            final_dup = []; final_int = []; final_beers = []; flagTriple = false; flagTripleMeds = "";
+            document.getElementById('boxDup').classList.add('hidden');
+            document.getElementById('boxInt').classList.add('hidden');
+            document.getElementById('boxBeers').classList.add('hidden');
+
+            final_dup = []; final_int = []; final_beers = []; flagTriple = false;
             let hallazgos = {};
 
+            // Triple Whammy
             const medsAINE = seleccionados.filter(m => m.atc.startsWith("M01A"));
             const medsACEI = seleccionados.filter(m => m.atc.startsWith("C09"));
             const medsDIUR = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.startsWith("C09B") || m.atc.startsWith("C09D"));
             
             if(medsAINE.length && medsACEI.length && medsDIUR.length) {
                 flagTriple = true;
-                const nA = medsAINE.map(m => m.name).join(', ');
-                const nI = medsACEI.map(m => m.name).join(', ');
-                const nD = medsDIUR.map(m => m.name).join(', ');
-                flagTripleMeds = `Componentes: [AINE: ${nA}] + [IECA/ARAII: ${nI}] + [DIUR\u00C9TICO: ${nD}]`;
+                flagTripleMeds = `[AINE: ${medsAINE.map(m=>m.name).join(', ')}] + [IECA/ARAII: ${medsACEI.map(m=>m.name).join(', ')}] + [DIUR\u00C9TICO: ${medsDIUR.map(m=>m.name).join(', ')}]`;
                 aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 TRIPLE TR\u00CDADA (WHAMMY)<br>${flagTripleMeds}</div>`;
                 aT.classList.remove('hidden');
             }
 
+            // Duplicidad
             let grps = {}; seleccionados.forEach(m => { let p = m.atc.substring(0,3); if(!grps[p]) grps[p]=[]; grps[p].push(m.name); });
-            for(let p in grps) if(grps[p].length > 1) { final_dup.push({ grp: p, meds: grps[p] }); rD.innerHTML += `<p>• GRUPO ${p}: ${grps[p].join(' + ')}</p>`; }
+            for(let p in grps) if(grps[p].length > 1) { 
+                final_dup.push({ grp: p, meds: grps[p] }); 
+                rD.innerHTML += `<p>• GRUPO ${p}: ${grps[p].join(' + ')}</p>`;
+                document.getElementById('boxDup').classList.remove('hidden');
+            }
 
+            // Interacciones y Beers
             DB_RULES.forEach(ru => {
                 seleccionados.forEach(m1 => {
                     if(ru.a === ru.b) {
@@ -270,21 +282,22 @@
                 });
             });
 
+            const weight = (act) => act.toUpperCase().includes("EVITAR") ? 3 : (act.toUpperCase().includes("PRECAUCION") ? 2 : 1);
+            function updateHallazgos(dict, key, rule) { if(!dict[key] || weight(rule.act) > weight(dict[key].act)) dict[key] = rule; }
+
             for(let key in hallazgos) {
                 const h = hallazgos[key];
                 if(h.msg.toUpperCase().includes("BEERS")) {
                     final_beers.push({ meds: key, desc: h.msg, act: h.act });
-                    rB.innerHTML += `<div class="mb-3 border-b border-slate-100 pb-2 text-[10px] font-bold"><p class="text-blue-700">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-blue-600 uppercase">ACCI\u00D3N: ${h.act}</p></div>`;
+                    rB.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-blue-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-blue-600">ACCI\u00D3N: ${h.act}</p></div>`;
+                    document.getElementById('boxBeers').classList.remove('hidden');
                 } else {
                     final_int.push({ meds: key, desc: h.msg, act: h.act });
-                    rI.innerHTML += `<div class="mb-3 border-b border-slate-100 pb-2 text-[10px] font-bold"><p class="text-red-700">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-red-600 uppercase">ACCI\u00D3N: ${h.act}</p></div>`;
+                    rI.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-red-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-red-600">ACCI\u00D3N: ${h.act}</p></div>`;
+                    document.getElementById('boxInt').classList.remove('hidden');
                 }
             }
             document.getElementById('btnPdf').classList.remove('hidden');
-        }
-
-        function updateHallazgos(dict, key, rule) {
-            if(!dict[key] || weight(rule.act) > weight(dict[key].act)) dict[key] = rule;
         }
 
         function descargarReporte() {
@@ -311,17 +324,10 @@
             const pc = doc.internal.getNumberOfPages();
             for (let i = 1; i <= pc; i++) {
                 doc.setPage(i); doc.setFontSize(8); doc.setTextColor(150); doc.text(`P\u00E1gina ${i} de ${pc}`, pW - 15, pH - 10, { align: 'right' });
-                if(i === pc) { doc.setFontSize(7); doc.text("Esta aplicaci\u00F3n es una herramienta de apoyo a la decisi\u00F3n cl\u00EDnica. Toda informaci\u00F3n proporcionada es responsabilidad exclusiva del m\u00E9dico tratante. Los resultados son sugerencias basadas en bases de datos farmacol\u00F3gicas y deben ser validados mediante el juicio profesional. La informaci\u00F3n no sustituye la consulta m\u00E9dica ni el criterio del especialista.", 15, pH - 25, { maxWidth: 185 }); }
+                if(i === pc) { doc.setFontSize(7); doc.text("Esta aplicaci\u00F3n es una herramienta de apoyo a la decisi\u00F3n cl\u00EDnica. Toda informaci\u00F3n proporcionada es responsabilidad exclusiva del m\u00E9dico tratante. La responsabilidad final recae en el profesional tratante.", 15, pH - 25, { maxWidth: 185 }); }
             }
             doc.save(`Vigilancia_${pac.replace(/\s+/g, '_')}.pdf`);
         }
     </script>
 </body>
 </html>
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js');
-        });
-    }
-</script>
