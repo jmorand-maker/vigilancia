@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v56.66</title>
+    <title>Vigilancia Móvil v56.68</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,9 +14,9 @@
         #sugCont { max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); position: absolute; width: 100%; z-index: 100; background: white; border: 1px solid #e2e8f0; }
         .sug-item { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 13px; font-weight: 600; color: #1e293b; display: block; line-height: 1.2; }
         .med-row { background: white; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; }
-        .med-name { font-weight: 800; font-size: 13px; color: #1e293b; }
         .badge-count { background: #4338ca; color: white; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 900; margin-left: 8px; }
         .sync-status { font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+        #debugLog { font-family: monospace; font-size: 10px; padding: 10px; background: #fee2e2; color: #991b1b; border-radius: 10px; margin-top: 20px; display: none; }
     </style>
 </head>
 <body class="min-h-screen pb-32">
@@ -25,13 +25,13 @@
         <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-emerald-500">
             <div class="bg-indigo-900 p-8 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-2xl font-black uppercase italic tracking-tighter">Vigilancia Móvil</h1>
-                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 italic">v56.66 • REFUERZO OFFLINE</p>
+                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 italic">v56.68 • FIX S25 ULTRA</p>
             </div>
             <div class="p-8 space-y-6">
                 <div class="p-4 bg-red-50 rounded-2xl border-2 border-red-100">
                     <h3 class="text-[12px] font-black text-red-700 uppercase mb-2 text-center">🛑 AVISO LEGAL</h3>
                     <p class="text-[10px] text-red-900 leading-tight italic text-justify">
-                        Esta aplicación es una herramienta de apoyo a la decisión clínica. Toda información proporcionada es responsabilidad exclusiva del médico tratante. La información no sustituye la consulta médica ni el criterio del especialista.
+                        Esta aplicación es una herramienta de apoyo clínico. La responsabilidad final recae en el profesional tratante.
                     </p>
                 </div>
                 <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ENTRAR</button>
@@ -40,8 +40,8 @@
     </div>
 
     <header class="bg-indigo-950 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.66</h1>
-        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Cargando...</div>
+        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.68</h1>
+        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
     </header>
 
     <main class="p-4 space-y-6">
@@ -49,15 +49,15 @@
             <h2 class="text-[10px] font-black text-indigo-900 uppercase italic mb-4">1. Sincronización</h2>
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="p-4 bg-indigo-50/50 rounded-2xl border-2 border-dashed border-indigo-200 text-center">
-                    <label class="block text-[8px] font-black text-indigo-700 mb-2 uppercase">Catálogo Meds</label>
+                    <label class="block text-[8px] font-black text-indigo-700 mb-2 uppercase">Meds CSV</label>
                     <input type="file" id="csvMeds" accept=".csv" class="text-[7px] w-full">
                 </div>
                 <div class="p-4 bg-red-50/50 rounded-2xl border-2 border-dashed border-red-200 text-center">
-                    <label class="block text-[8px] font-black text-red-700 mb-2 uppercase">Reglas Ints</label>
+                    <label class="block text-[8px] font-black text-red-700 mb-2 uppercase">Reglas CSV</label>
                     <input type="file" id="csvInts" accept=".csv" class="text-[7px] w-full">
                 </div>
             </div>
-            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg italic">Sincronizar Datos</button>
+            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg">Sincronizar Datos</button>
         </section>
 
         <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200">
@@ -99,6 +99,8 @@
                 <div id="resBeers" class="text-xs space-y-4 font-medium"></div>
             </div>
         </div>
+
+        <div id="debugLog"></div>
     </main>
 
     <footer class="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md flex gap-3 border-t border-slate-200 z-40">
@@ -110,19 +112,10 @@
         let DB_MEDS = []; let DB_RULES = []; let seleccionados = [];
         let final_dup = []; let final_int = []; let final_beers = []; let flagTriple = false; let flagTripleMeds = "";
 
-        // 1. REGISTRO DE SERVICE WORKER (Reforzado para S25 Ultra)
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                .then(reg => {
-                    console.log('SW activo');
-                    reg.update(); // Forzar búsqueda de actualizaciones
-                })
-                .catch(err => console.log('Error SW:', err));
-            });
+            window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').then(reg => reg.update()); });
         }
 
-        // Cargar datos locales al iniciar
         window.onload = () => {
             const m = localStorage.getItem('pwa_meds');
             const r = localStorage.getItem('pwa_rules');
@@ -130,10 +123,14 @@
                 DB_MEDS = JSON.parse(m);
                 DB_RULES = JSON.parse(r);
                 actualizarEstadoUI();
-            } else {
-                document.getElementById('status').innerText = "Sin Datos";
             }
         };
+
+        function debug(msg) {
+            const l = document.getElementById('debugLog');
+            l.style.display = 'block';
+            l.innerHTML += `> ${msg}<br>`;
+        }
 
         function actualizarEstadoUI() {
             const s = document.getElementById('status');
@@ -141,42 +138,33 @@
             s.className = "sync-status bg-emerald-500 text-white";
         }
 
-        function readFile(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsText(file);
-            });
-        }
-
         async function procesarArchivos() {
             const fM = document.getElementById('csvMeds').files[0];
             const fI = document.getElementById('csvInts').files[0];
-            if(!fM || !fI) return alert("Cargue ambos archivos CSV.");
+            if(!fM || !fI) return alert("Cargue ambos archivos.");
             try {
-                const tM = await readFile(fM);
+                const tM = await fM.text();
                 const lM = tM.split(/\r?\n/).filter(l => l.trim() !== "");
                 const sepM = lM[0].includes(';') ? ';' : ',';
                 DB_MEDS = [];
                 lM.forEach((l) => {
-                    const c = l.split(sepM).map(v => v.replace(/"/g, '').trim());
-                    if(c.length >= 2) {
-                        const name = c[0].toUpperCase();
-                        if (name === "GENERICO" || name === "NOMBRE") return;
-                        const norm = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                        DB_MEDS.push({ name, norm, atc: c[1].toUpperCase() });
+                    const c = l.split(sepM).map(v => (v || "").replace(/"/g, '').trim());
+                    if(c.length >= 2 && c[0]) {
+                        DB_MEDS.push({ 
+                            name: c[0].toUpperCase(), 
+                            norm: c[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase(), 
+                            atc: (c[1] || "").toUpperCase() 
+                        });
                     }
                 });
 
-                const tI = await readFile(fI);
+                const tI = await fI.text();
                 const lI = tI.split(/\r?\n/).filter(l => l.trim() !== "");
                 const sepI = lI[0].includes(';') ? ';' : ',';
                 DB_RULES = [];
                 lI.forEach((l) => {
-                    const c = l.split(sepI).map(v => v.replace(/"/g, '').trim());
-                    if(c.length >= 4) {
-                        if (c[0].toUpperCase() === "ATC_A") return;
+                    const c = l.split(sepI).map(v => (v || "").replace(/"/g, '').trim());
+                    if(c.length >= 4 && c[0] && !c[0].toUpperCase().includes("ATC")) {
                         DB_RULES.push({ a: c[0].toUpperCase(), b: c[1].toUpperCase(), msg: c[2], act: c[3] });
                     }
                 });
@@ -184,15 +172,15 @@
                 localStorage.setItem('pwa_meds', JSON.stringify(DB_MEDS));
                 localStorage.setItem('pwa_rules', JSON.stringify(DB_RULES));
                 actualizarEstadoUI();
-                alert("Bases guardadas localmente.");
-            } catch(e) { alert("Error de lectura."); }
+                alert("Bases guardadas.");
+            } catch(e) { debug("Error carga: " + e.message); }
         }
 
         function handleSearch(val) {
             const cont = document.getElementById('sugCont');
             if(val.length < 2) { cont.classList.add('hidden'); return; }
             const searchNorm = val.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-            const matches = DB_MEDS.filter(m => m.norm.includes(searchNorm)).slice(0, 15);
+            const matches = DB_MEDS.filter(m => m.norm && m.norm.includes(searchNorm)).slice(0, 15);
             if(matches.length > 0) {
                 cont.innerHTML = matches.map(m => `<div class="sug-item" onclick="selectMed('${m.name}', '${m.atc}')">${m.name} <span class="text-emerald-500 font-mono text-[10px]">[${m.atc}]</span></div>`).join('');
                 cont.classList.remove('hidden');
@@ -200,10 +188,8 @@
         }
 
         function selectMed(name, atc) {
-            if(!seleccionados.some(s => s.name === name)) {
-                seleccionados.push({ name, atc });
-                renderUI();
-            }
+            seleccionados.push({ name, atc: (atc || "S/N") });
+            renderUI();
             document.getElementById('farmaInput').value = "";
             document.getElementById('sugCont').classList.add('hidden');
         }
@@ -214,119 +200,120 @@
             cont.innerHTML = seleccionados.map((f, i) => `
                 <div class="med-row">
                     <div class="med-info"><span class="med-name">${f.name}</span><br><span class="med-atc font-mono text-[10px] text-emerald-600">${f.atc}</span></div>
-                    <button onclick="seleccionados.splice(${i},1); renderUI()" class="text-red-500 p-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
+                    <button onclick="seleccionados.splice(${i},1); renderUI()" class="text-red-500 p-2">✕</button>
                 </div>`).join('');
         }
 
         function limpiarTodo() {
             if(confirm("¿Limpiar todo?")) {
                 seleccionados = []; 
-                document.getElementById('pNombre').value = "";
-                document.getElementById('pEdad').value = "";
-                document.getElementById('pPeso').value = "";
-                document.getElementById('resultados').classList.add('hidden');
-                document.getElementById('btnPdf').classList.add('hidden');
+                document.getElementById('pNombre').value = ""; document.getElementById('pEdad').value = ""; document.getElementById('pPeso').value = "";
+                document.getElementById('resultados').classList.add('hidden'); document.getElementById('btnPdf').classList.add('hidden');
+                document.getElementById('debugLog').innerHTML = "";
                 renderUI();
             }
         }
 
         function ejecutarAnalisis() {
-            if(seleccionados.length < 1) return;
-            const resArea = document.getElementById('resultados');
-            resArea.classList.remove('hidden');
-            
-            const rD = document.getElementById('resDup'); rD.innerHTML = "";
-            const rI = document.getElementById('resInt'); rI.innerHTML = "";
-            const rB = document.getElementById('resBeers'); rB.innerHTML = "";
-            const aT = document.getElementById('alertaTriple'); aT.classList.add('hidden');
-            
-            document.getElementById('boxDup').classList.add('hidden');
-            document.getElementById('boxInt').classList.add('hidden');
-            document.getElementById('boxBeers').classList.add('hidden');
+            try {
+                if(seleccionados.length < 1) return;
+                document.getElementById('resultados').classList.remove('hidden');
+                
+                const rD = document.getElementById('resDup'); rD.innerHTML = "";
+                const rI = document.getElementById('resInt'); rI.innerHTML = "";
+                const rB = document.getElementById('resBeers'); rB.innerHTML = "";
+                const aT = document.getElementById('alertaTriple'); aT.classList.add('hidden');
+                
+                document.getElementById('boxDup').classList.add('hidden');
+                document.getElementById('boxInt').classList.add('hidden');
+                document.getElementById('boxBeers').classList.add('hidden');
 
-            final_dup = []; final_int = []; final_beers = []; flagTriple = false;
-            let hallazgos = {};
+                final_dup = []; final_int = []; final_beers = []; flagTriple = false;
+                let hallazgos = {};
 
-            // Triple Whammy
-            const medsAINE = seleccionados.filter(m => m.atc.startsWith("M01A"));
-            const medsACEI = seleccionados.filter(m => m.atc.startsWith("C09"));
-            const medsDIUR = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.startsWith("C09B") || m.atc.startsWith("C09D"));
-            
-            if(medsAINE.length && medsACEI.length && medsDIUR.length) {
-                flagTriple = true;
-                flagTripleMeds = `[AINE: ${medsAINE.map(m=>m.name).join(', ')}] + [IECA/ARAII: ${medsACEI.map(m=>m.name).join(', ')}] + [DIUR\u00C9TICO: ${medsDIUR.map(m=>m.name).join(', ')}]`;
-                aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 TRIPLE TR\u00CDADA (WHAMMY)<br>${flagTripleMeds}</div>`;
-                aT.classList.remove('hidden');
-            }
+                // 1. Triple Whammy
+                const medsAINE = seleccionados.filter(m => m.atc && m.atc.startsWith("M01A"));
+                const medsACEI = seleccionados.filter(m => m.atc && m.atc.startsWith("C09"));
+                const medsDIUR = seleccionados.filter(m => m.atc && (m.atc.startsWith("C03") || m.atc.startsWith("C09B") || m.atc.startsWith("C09D")));
+                
+                if(medsAINE.length && medsACEI.length && medsDIUR.length) {
+                    flagTriple = true;
+                    flagTripleMeds = `AINE: ${medsAINE.map(m=>m.name).join(', ')} | IECA: ${medsACEI.map(m=>m.name).join(', ')} | DIUR: ${medsDIUR.map(m=>m.name).join(', ')}`;
+                    aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 TRIPLE WHAMMY DETECTADO<br>${flagTripleMeds}</div>`;
+                    aT.classList.remove('hidden');
+                }
 
-            // Duplicidad
-            let grps = {}; seleccionados.forEach(m => { let p = m.atc.substring(0,3); if(!grps[p]) grps[p]=[]; grps[p].push(m.name); });
-            for(let p in grps) if(grps[p].length > 1) { 
-                final_dup.push({ grp: p, meds: grps[p] }); 
-                rD.innerHTML += `<p>• GRUPO ${p}: ${grps[p].join(' + ')}</p>`;
-                document.getElementById('boxDup').classList.remove('hidden');
-            }
-
-            // Interacciones y Beers
-            DB_RULES.forEach(ru => {
-                seleccionados.forEach(m1 => {
-                    if(ru.a === ru.b) {
-                        if(m1.atc === ru.a || (ru.a.length <= 4 && m1.atc.startsWith(ru.a))) updateHallazgos(hallazgos, m1.name, ru);
-                    } else {
-                        seleccionados.forEach(m2 => {
-                            if(m1.name !== m2.name && m1.atc.startsWith(ru.a) && m2.atc.startsWith(ru.b)) updateHallazgos(hallazgos, `${m1.name} + ${m2.name}`, ru);
-                        });
+                // 2. Duplicidad
+                let grps = {}; 
+                seleccionados.forEach(m => { 
+                    if(m.atc && m.atc.length >= 3) {
+                        let p = m.atc.substring(0,3); 
+                        if(!grps[p]) grps[p]=[]; grps[p].push(m.name); 
                     }
                 });
-            });
-
-            const weight = (act) => act.toUpperCase().includes("EVITAR") ? 3 : (act.toUpperCase().includes("PRECAUCION") ? 2 : 1);
-            function updateHallazgos(dict, key, rule) { if(!dict[key] || weight(rule.act) > weight(dict[key].act)) dict[key] = rule; }
-
-            for(let key in hallazgos) {
-                const h = hallazgos[key];
-                if(h.msg.toUpperCase().includes("BEERS")) {
-                    final_beers.push({ meds: key, desc: h.msg, act: h.act });
-                    rB.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-blue-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-blue-600">ACCI\u00D3N: ${h.act}</p></div>`;
-                    document.getElementById('boxBeers').classList.remove('hidden');
-                } else {
-                    final_int.push({ meds: key, desc: h.msg, act: h.act });
-                    rI.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-red-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-red-600">ACCI\u00D3N: ${h.act}</p></div>`;
-                    document.getElementById('boxInt').classList.remove('hidden');
+                for(let p in grps) if(grps[p].length > 1) { 
+                    final_dup.push({ grp: p, meds: grps[p] }); 
+                    rD.innerHTML += `<p>• GRUPO ${p}: ${grps[p].join(' + ')}</p>`;
+                    document.getElementById('boxDup').classList.remove('hidden');
                 }
-            }
-            document.getElementById('btnPdf').classList.remove('hidden');
+
+                // 3. Interacciones (BUCLE OPTIMIZADO)
+                if(DB_RULES.length > 0) {
+                    for(let ru of DB_RULES) {
+                        if(!ru.a || !ru.b) continue;
+                        for(let m1 of seleccionados) {
+                            if(!m1.atc) continue;
+                            if(ru.a === ru.b) {
+                                if(m1.atc.startsWith(ru.a)) addH(hallazgos, m1.name, ru);
+                            } else {
+                                for(let m2 of seleccionados) {
+                                    if(m1.name === m2.name || !m2.atc) continue;
+                                    if(m1.atc.startsWith(ru.a) && m2.atc.startsWith(ru.b)) {
+                                        addH(hallazgos, `${m1.name} + ${m2.name}`, ru);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                function addH(dict, key, rule) {
+                    const w = (a) => (a || "").toUpperCase().includes("EVITAR") ? 3 : ((a || "").toUpperCase().includes("PRECAUCION") ? 2 : 1);
+                    if(!dict[key] || w(rule.act) > w(dict[key].act)) dict[key] = rule;
+                }
+
+                for(let key in hallazgos) {
+                    const h = hallazgos[key];
+                    if((h.msg || "").toUpperCase().includes("BEERS")) {
+                        final_beers.push({ meds: key, desc: h.msg, act: h.act });
+                        rB.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-blue-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-blue-600">ACCI\u00D3N: ${h.act}</p></div>`;
+                        document.getElementById('boxBeers').classList.remove('hidden');
+                    } else {
+                        final_int.push({ meds: key, desc: h.msg, act: h.act });
+                        rI.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-red-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-red-600">ACCI\u00D3N: ${h.act}</p></div>`;
+                        document.getElementById('boxInt').classList.remove('hidden');
+                    }
+                }
+                
+                document.getElementById('btnPdf').classList.remove('hidden');
+            } catch(err) { debug("Error Análisis: " + err.message); }
         }
 
         function descargarReporte() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
-            const pW = doc.internal.pageSize.getWidth(); const pH = doc.internal.pageSize.getHeight();
-            let pac = (document.getElementById('pNombre').value || "AN\u00D3NIMO").toUpperCase();
-            let ed = document.getElementById('pEdad').value || "--"; let pe = document.getElementById('pPeso').value || "--";
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ format: 'letter' });
+                const pW = doc.internal.pageSize.getWidth();
+                let pac = (document.getElementById('pNombre').value || "AN\u00D3NIMO").toUpperCase();
+                
+                doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 35, 'F');
+                doc.setTextColor(255); doc.setFontSize(18); doc.text("REPORTE DE VIGILANCIA", 15, 22);
+                doc.setTextColor(0); doc.setFontSize(10);
+                doc.text(`Paciente: ${pac} | Edad: ${document.getElementById('pEdad').value || "--"}`, 15, 45);
 
-            doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 35, 'F');
-            doc.setTextColor(255); doc.setFontSize(18); doc.text("REPORTE DE VIGILANCIA FARMACOL\u00D3GICA", 15, 22);
-            doc.setTextColor(0); doc.setFontSize(10);
-            doc.text(`Paciente: ${pac} | Edad: ${ed} A\u00D1OS | Peso: ${pe} KG`, 15, 45);
-
-            doc.setFontSize(11); doc.setTextColor(71, 85, 105); doc.text("MEDICAMENTOS EN LA PRESCRIPCI\u00D3N", 15, 60);
-            doc.autoTable({ startY: 65, head: [['NOMBRE GEN\u00C9RICO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 8 } });
-
-            let curY = doc.lastAutoTable.finalY + 10;
-            if(flagTriple) { doc.setTextColor(185, 28, 28); doc.setFontSize(11); doc.text("ALERTA CR\u00CDTICA: TRIPLE TR\u00CDADA", 15, curY); curY += 5; doc.setFontSize(8); doc.setTextColor(0); doc.text(flagTripleMeds, 15, curY, { maxWidth: 180 }); curY += 12; }
-            if(final_dup.length) { doc.setFontSize(11); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAP\u00C9UTICA", 15, curY); doc.autoTable({ startY: curY + 5, head: [['ATC', 'MEDICAMENTOS']], body: final_dup.map(d => [d.grp, d.meds.join(' / ')]), headStyles: {fillColor: [217, 119, 6]} }); curY = doc.lastAutoTable.finalY + 10; }
-            if(final_int.length) { doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES MEDICAMENTOSAS", 15, curY); doc.autoTable({ startY: curY + 5, head: [['MEDICAMENTOS', 'RIESGO CLINICO', 'ACCI\u00D3N']], body: final_int.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 8 } }); curY = doc.lastAutoTable.finalY + 10; }
-            if(final_beers.length) { doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS", 15, curY); doc.autoTable({ startY: curY + 5, head: [['MEDICAMENTOS', 'RIESGO GERI\u00C1TRICO', 'ACCI\u00D3N']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 8 } }); }
-            
-            const pc = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pc; i++) {
-                doc.setPage(i); doc.setFontSize(8); doc.setTextColor(150); doc.text(`P\u00E1gina ${i} de ${pc}`, pW - 15, pH - 10, { align: 'right' });
-                if(i === pc) { doc.setFontSize(7); doc.text("Esta aplicaci\u00F3n es una herramienta de apoyo a la decisi\u00F3n cl\u00EDnica. Toda informaci\u00F3n proporcionada es responsabilidad exclusiva del m\u00E9dico tratante. La responsabilidad final recae en el profesional tratante.", 15, pH - 25, { maxWidth: 185 }); }
-            }
-            doc.save(`Vigilancia_${pac.replace(/\s+/g, '_')}.pdf`);
+                doc.autoTable({ startY: 55, head: [['MEDICAMENTO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), styles: { fontSize: 8 } });
+                doc.save(`Reporte_${pac}.pdf`);
+            } catch(e) { debug("Error PDF: " + e.message); }
         }
     </script>
 </body>
