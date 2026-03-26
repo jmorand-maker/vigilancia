@@ -1,5 +1,5 @@
 // 1. Cambiamos el nombre de la caché para forzar al S25 Ultra a borrar lo anterior
-const CACHE_NAME = 'vigilancia-v56-70'; 
+const CACHE_NAME = 'vigilancia-v56-72'; 
 
 // 2. Lista de archivos esenciales para que funcione offline
 const ASSETS = [
