@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v56.70</title>
+    <title>Vigilancia Móvil v56.71</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,44 +25,44 @@
     <div id="welcomeScreen" class="fixed inset-0 bg-indigo-950 flex items-center justify-center p-6 z-[9999]">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-emerald-500">
             <div class="bg-indigo-900 p-8 text-white text-center border-b-4 border-emerald-500">
-                <h1 class="text-2xl font-black uppercase italic tracking-tighter">Vigilancia Móvil</h1>
-                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 italic">v56.70 • EDICI\u00D3N PRODUCCI\u00D3N</p>
+                <h1 class="text-2xl font-black uppercase italic tracking-tighter text-white">Vigilancia Móvil</h1>
+                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 italic">v56.71 • FINAL FIX</p>
             </div>
             <div class="p-8 space-y-4">
                 <div class="p-4 bg-red-50 rounded-2xl border-2 border-red-100">
-                    <h3 class="text-[12px] font-black text-red-700 uppercase mb-2 text-center">🛑 AVISO LEGAL Y RESPONSABILIDAD</h3>
+                    <h3 class="text-[12px] font-black text-red-700 uppercase mb-2 text-center">🛑 AVISO LEGAL</h3>
                     <p class="text-[10px] text-red-900 leading-tight italic text-justify">
-                        Esta aplicaci\u00F3n es una herramienta de apoyo a la decisi\u00F3n cl\u00EDnica y no sustituye el juicio profesional. Toda informaci\u00F3n proporcionada es responsabilidad exclusiva del m\u00E9dico tratante. El desarrollador no se hace responsable de decisiones m\u00E9dicas tomadas basadas en esta herramienta.
+                        Esta aplicación es una herramienta de apoyo clínico. Toda información proporcionada es responsabilidad exclusiva del médico tratante[cite: 9, 10].
                     </p>
                 </div>
-                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ENTRAR Y ACEPTAR</button>
+                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ACEPTAR Y ENTRAR</button>
             </div>
         </div>
     </div>
 
     <header class="bg-indigo-950 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.70</h1>
-        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
+        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.71</h1>
+        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Cargando...</div>
     </header>
 
     <main class="p-4 space-y-6">
         <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200">
-            <h2 class="text-[10px] font-black text-indigo-900 uppercase italic mb-4">1. Sincronizaci\u00F3n</h2>
+            <h2 class="text-[10px] font-black text-indigo-900 uppercase italic mb-4">1. Sincronización</h2>
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 text-center">
-                    <label class="block text-[8px] font-black mb-2 uppercase">Meds CSV</label>
+                    <label class="block text-[8px] font-black mb-2 uppercase text-indigo-900">Meds CSV</label>
                     <input type="file" id="csvMeds" accept=".csv" class="text-[7px] w-full">
                 </div>
                 <div class="p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 text-center">
-                    <label class="block text-[8px] font-black mb-2 uppercase">Ints CSV</label>
+                    <label class="block text-[8px] font-black mb-2 uppercase text-indigo-900">Reglas CSV</label>
                     <input type="file" id="csvInts" accept=".csv" class="text-[7px] w-full">
                 </div>
             </div>
-            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg">Cargar y Guardar Datos</button>
+            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg italic">Sincronizar Bases</button>
         </section>
 
         <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200">
-            <h2 class="text-[10px] font-black text-indigo-900 uppercase mb-3 italic">2. Datos del Paciente</h2>
+            <h2 class="text-[10px] font-black text-indigo-900 uppercase mb-3 italic">2. Datos de Paciente</h2>
             <input type="text" id="pNombre" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3 text-sm font-black uppercase outline-none mb-3" placeholder="Nombre completo">
             <div class="flex gap-2">
                 <input type="number" id="pEdad" class="w-1/2 bg-slate-100 border-2 border-slate-200 rounded-xl p-3 text-sm font-black" placeholder="Edad">
@@ -73,7 +73,7 @@
         <section class="space-y-4 relative">
             <div class="flex justify-between items-center px-1">
                 <div class="flex items-center">
-                    <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripci\u00F3n Actual</h2>
+                    <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripción Actual</h2>
                     <span id="medCount" class="badge-count">0</span>
                 </div>
                 <button onclick="limpiarTodo()" class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase shadow-md">Limpiar</button>
@@ -88,7 +88,7 @@
         <div id="resultados" class="hidden space-y-4 pb-24">
             <div id="alertaTriple" class="hidden"></div>
             <div id="boxDup" class="bg-white rounded-3xl p-5 border-l-8 border-orange-500 shadow-lg hidden">
-                <h3 class="text-orange-600 font-black text-[10px] uppercase mb-3 italic">⚠️ Duplicidad Terap\u00E9utica</h3>
+                <h3 class="text-orange-600 font-black text-[10px] uppercase mb-3 italic">⚠️ Duplicidad Terapéutica</h3>
                 <div id="resDup" class="text-xs space-y-2 font-bold"></div>
             </div>
             <div id="boxInt" class="bg-white rounded-3xl p-5 border-l-8 border-red-600 shadow-lg hidden">
@@ -113,19 +113,12 @@
         let DB_MEDS = []; let DB_RULES = []; let seleccionados = [];
         let final_dup = []; let final_int = []; let final_beers = []; let flagTriple = false; let flagTripleMeds = "";
 
-        // Registro SW con actualizaci\u00F3n forzada
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(reg => reg.update());
-        }
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').then(reg => reg.update()); }
 
         window.onload = () => {
             const m = localStorage.getItem('pwa_meds');
             const r = localStorage.getItem('pwa_rules');
-            if(m && r) { 
-                DB_MEDS = JSON.parse(m); 
-                DB_RULES = JSON.parse(r); 
-                actualizarEstadoUI(); 
-            }
+            if(m && r) { DB_MEDS = JSON.parse(m); DB_RULES = JSON.parse(r); actualizarEstadoUI(); }
         };
 
         function addLog(msg) {
@@ -152,39 +145,34 @@
                 lM.forEach(l => {
                     const c = l.split(sepM).map(v => (v || "").replace(/"/g, '').trim());
                     if(c.length >= 2 && c[0]) {
-                        // Guardamos el original para mostrar y una versi\u00F3n normalizada para buscar
                         const orig = c[0].toUpperCase();
                         const norm = orig.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                         DB_MEDS.push({ name: orig, norm: norm, atc: (c[1] || "").toUpperCase() });
                     }
                 });
-
                 const tI = await fI.text();
                 const lI = tI.split(/\r?\n/).filter(l => l.trim() !== "");
                 const sepI = lI[0].includes(';') ? ';' : ',';
                 DB_RULES = [];
                 lI.forEach(l => {
                     const c = l.split(sepI).map(v => (v || "").replace(/"/g, '').trim());
-                    if(c.length >= 4 && c[0] && !c[0].toUpperCase().includes("ATC")) {
+                    if(c.length >= 4 && c[0] && !c[0].includes("ATC")) {
                         DB_RULES.push({ a: c[0].toUpperCase(), b: c[1].toUpperCase(), msg: c[2], act: c[3] });
                     }
                 });
                 localStorage.setItem('pwa_meds', JSON.stringify(DB_MEDS));
                 localStorage.setItem('pwa_rules', JSON.stringify(DB_RULES));
                 actualizarEstadoUI();
-                alert("Guardado exitoso.");
-            } catch(e) { debug("Error carga: " + e.message); }
+                alert("Sincronización Exitosa.");
+            } catch(e) { alert("Error: " + e.message); }
         }
 
         function handleSearch(val) {
             const cont = document.getElementById('sugCont');
             if(val.length < 2) { cont.classList.add('hidden'); return; }
-            // Normalizamos el valor de búsqueda
             const q = val.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-            // Buscamos en el campo normalizado
             const matches = DB_MEDS.filter(m => m.norm && m.norm.includes(q)).slice(0, 15);
             if(matches.length > 0) {
-                // Mostramos el nombre original con acentos
                 cont.innerHTML = matches.map(m => `<div class="sug-item" onclick="selectMed('${m.name}', '${m.atc}')">${m.name} <span class="text-emerald-500 font-mono text-[9px]">[${m.atc}]</span></div>`).join('');
                 cont.classList.remove('hidden');
             } else { cont.classList.add('hidden'); }
@@ -195,7 +183,7 @@
             document.getElementById('medCount').innerText = seleccionados.length;
             const cont = document.getElementById('listaSeleccionados');
             cont.innerHTML += `<div class="med-row">
-                <div class="med-info"><span class="med-name">${name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${atc}</span></div>
+                <div class="med-info"><span class="med-name text-indigo-950 font-black">${name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${atc}</span></div>
                 <button onclick="this.parentElement.remove(); recontar();" class="text-red-500 font-bold p-2">✕</button>
             </div>`;
             document.getElementById('farmaInput').value = "";
@@ -203,7 +191,6 @@
         }
 
         function recontar() {
-            // Actualizar la lista interna 'seleccionados' basándose en el DOM para mayor seguridad
             const listaDOM = document.getElementById('listaSeleccionados').querySelectorAll('.med-info');
             seleccionados = [];
             listaDOM.forEach(div => {
@@ -220,10 +207,10 @@
 
         function ejecutarAnalisis() {
             try {
-                addLog("Iniciando An\u00E1lisis...");
                 if(seleccionados.length < 1) return;
-                recontar(); // Asegurar que 'seleccionados' est\u00E1 sincronizado con el DOM
+                recontar();
                 document.getElementById('resultados').classList.remove('hidden');
+                document.getElementById('btnPdf').classList.remove('hidden');
                 
                 const rD = document.getElementById('resDup'); rD.innerHTML = "";
                 const rI = document.getElementById('resInt'); rI.innerHTML = "";
@@ -237,145 +224,88 @@
                 final_dup = []; final_int = []; final_beers = []; flagTriple = false;
                 let hallazgos = {};
 
-                // 1. Triple Whammy
+                // 1. Triple Whammy [cite: 3]
                 const medsAINE = seleccionados.filter(m => m.atc && m.atc.startsWith("M01A"));
                 const medsACEI = seleccionados.filter(m => m.atc && m.atc.startsWith("C09"));
                 const medsDIUR = seleccionados.filter(m => m.atc && (m.atc.startsWith("C03") || m.atc.startsWith("C09B") || m.atc.startsWith("C09D")));
                 
                 if(medsAINE.length && medsACEI.length && medsDIUR.length) {
                     flagTriple = true;
-                    flagTripleMeds = `AINE: ${medsAINE.map(m=>m.name).join(', ')} | IECA/ARAII: ${medsACEI.map(m=>m.name).join(', ')} | DIUR\u00C9TICO: ${medsDIUR.map(m=>m.name).join(', ')}`;
-                    aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 TRIPLE TR\u00CDADA (WHAMMY) DETECTADO<br>${flagTripleMeds}</div>`;
+                    flagTripleMeds = `AINE: ${medsAINE.map(m=>m.name).join(', ')} | IECA: ${medsACEI.map(m=>m.name).join(', ')} | DIUR: ${medsDIUR.map(m=>m.name).join(', ')}`;
+                    aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 TRIPLE WHAMMY DETECTADO<br>${flagTripleMeds}</div>`;
                     aT.classList.remove('hidden');
                 }
-                addLog("Triple Whammy OK");
 
-                // 2. Duplicidad
+                // 2. Duplicidad [cite: 4]
                 let grps = {}; 
-                seleccionados.forEach(m => { 
-                    if(m.atc && m.atc.length >= 3) {
-                        let p = m.atc.substring(0,3); 
-                        if(!grps[p]) grps[p]=[]; grps[p].push(m.name); 
-                    }
-                });
+                seleccionados.forEach(m => { if(m.atc && m.atc.length >= 3) { let p = m.atc.substring(0,3); if(!grps[p]) grps[p]=[]; grps[p].push(m.name); } });
                 for(let p in grps) if(grps[p].length > 1) { 
                     final_dup.push({ grp: p, meds: grps[p] }); 
                     rD.innerHTML += `<p>• GRUPO ${p}: ${grps[p].join(' + ')}</p>`;
                     document.getElementById('boxDup').classList.remove('hidden');
                 }
-                addLog("Duplicidad OK");
 
-                // 3. Interacciones (BUCLE ULTRA RESILIENTE)
-                if(DB_RULES.length > 0) {
-                    addLog(`Analizando ${DB_RULES.length} reglas...`);
-                    for(let ru of DB_RULES) {
-                        for(let m1 of seleccionados) {
-                            if(!m1.atc) continue;
-                            if(ru.a === ru.b) {
-                                // Regla para un solo fármaco (Criterios de Beers, Duplicidad forzada)
-                                if(m1.atc.startsWith(ru.a)) {
-                                    const k = m1.name;
-                                    const pesoRu = getW(ru.act);
-                                    if(!hallazgos[k] || pesoRu > getW(hallazgos[k].act)) hallazgos[k] = ru;
-                                }
-                            } else {
-                                // Regla para dos fármacos
-                                for(let m2 of seleccionados) {
-                                    if(m1.name === m2.name || !m2.atc) continue;
-                                    if(m1.atc.startsWith(ru.a) && m2.atc.startsWith(ru.b)) {
-                                        const k = `${m1.name} + ${m2.name}`;
-                                        const pesoRu = getW(ru.act);
-                                        if(!hallazgos[k] || pesoRu > getW(hallazgos[k].act)) hallazgos[k] = ru;
-                                    }
+                // 3. Interacciones [cite: 6, 8]
+                for(let ru of DB_RULES) {
+                    for(let m1 of seleccionados) {
+                        if(ru.a === ru.b) {
+                            if(m1.atc.startsWith(ru.a)) {
+                                const k = m1.name; if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = ru;
+                            }
+                        } else {
+                            for(let m2 of seleccionados) {
+                                if(m1.name !== m2.name && m1.atc.startsWith(ru.a) && m2.atc.startsWith(ru.b)) {
+                                    const k = `${m1.name} + ${m2.name}`; if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = ru;
                                 }
                             }
                         }
                     }
                 }
 
-                // Renderizar hallazgos
                 for(let key in hallazgos) {
                     const h = hallazgos[key];
-                    const msgUpper = (h.msg || "").toUpperCase();
-                    if(msgUpper.includes("BEERS")) {
+                    if((h.msg || "").toUpperCase().includes("BEERS")) {
                         final_beers.push({ meds: key, desc: h.msg, act: h.act });
-                        rB.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-blue-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-blue-600 font-black">ACCI\u00D3N: ${h.act}</p></div>`;
+                        rB.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-blue-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-blue-600 font-black">ACCIÓN: ${h.act}</p></div>`;
                         document.getElementById('boxBeers').classList.remove('hidden');
                     } else {
                         final_int.push({ meds: key, desc: h.msg, act: h.act });
-                        rI.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-red-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-red-600 font-black">ACCI\u00D3N: ${h.act}</p></div>`;
+                        rI.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-red-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-red-600 font-black">ACCIÓN: ${h.act}</p></div>`;
                         document.getElementById('boxInt').classList.remove('hidden');
                     }
                 }
-                addLog("Paso 3: Interacciones OK");
-                // Mostrar botón de reporte al finalizar análisis
-                document.getElementById('btnPdf').classList.remove('hidden');
-
-            } catch(e) { debug(`CRASH An\u00E1lisis: ${e.message}`); }
+                addLog("Análisis completado.");
+            } catch(e) { addLog(`Error: ${e.message}`); }
         }
 
-        // --- FUNCI\u00D3N DE REPORTE COMPLETA RE-IMPLEMENTADA ---
         function descargarReporte() {
             try {
-                addLog("Generando PDF Completo...");
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
                 const pW = doc.internal.pageSize.getWidth(); const pH = doc.internal.pageSize.getHeight();
-                let pac = (document.getElementById('pNombre').value || "AN\u00D3NIMO").toUpperCase();
-                let ed = document.getElementById('pEdad').value || "--"; let pe = document.getElementById('pPeso').value || "--";
-
-                // Encabezado
+                let pac = (document.getElementById('pNombre').value || "ANÓNIMO").toUpperCase();
+                
                 doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 35, 'F');
-                doc.setTextColor(255); doc.setFontSize(18); doc.text("REPORTE DE VIGILANCIA FARMACOL\u00D3GICA", 15, 22);
+                doc.setTextColor(255); doc.setFontSize(16); doc.text("REPORTE DE VIGILANCIA FARMACOLÓGICA", 15, 22);
                 doc.setTextColor(0); doc.setFontSize(10);
-                doc.text(`Paciente: ${pac} | Edad: ${ed} A\u00D1OS | Peso: ${pe} KG`, 15, 45);
+                doc.text(`Paciente: ${pac} | Edad: ${document.getElementById('pEdad').value || "--"} | Peso: ${document.getElementById('pPeso').value || "--"}`, 15, 45);
 
-                // Tabla de Fármacos
-                doc.setFontSize(11); doc.setTextColor(71, 85, 105); doc.text("MEDICAMENTOS EN LA PRESCRIPCI\u00D3N", 15, 60);
-                doc.autoTable({ startY: 65, head: [['NOMBRE GEN\u00C9RICO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 8 } });
-
+                doc.autoTable({ startY: 55, head: [['MEDICAMENTO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 8 } });
                 let curY = doc.lastAutoTable.finalY + 10;
 
-                // Sección 1: Triple Whammy
-                if(flagTriple) { 
-                    doc.setTextColor(185, 28, 28); doc.setFontSize(11); doc.text("ALERTA CR\u00CDTICA: TRIPLE TR\u00CDADA (WHAMMY)", 15, curY); 
-                    curY += 5; doc.setFontSize(8); doc.setTextColor(0); doc.text(flagTripleMeds, 15, curY, { maxWidth: 180 }); curY += 12; 
-                }
-
-                // Sección 2: Duplicidad (Tabla)
-                if(final_dup.length) { 
-                    doc.setFontSize(11); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAP\u00C9UTICA DETECTADA", 15, curY); 
-                    doc.autoTable({ startY: curY + 5, head: [['ATC GRUPO', 'MEDICAMENTOS']], body: final_dup.map(d => [d.grp, d.meds.join(' + ')]), headStyles: {fillColor: [217, 119, 6]}, styles: {fontSize: 8} }); 
-                    curY = doc.lastAutoTable.finalY + 10; 
-                }
-
-                // Sección 3: Interacciones (Tabla Completa)
-                if(final_int.length) { 
-                    doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES MEDICAMENTOSAS (M\u00C1XIMA SEVERIDAD)", 15, curY); 
-                    doc.autoTable({ startY: curY + 5, head: [['MEDICAMENTOS', 'RIESGO CL\u00CDNICO DETALLADO', 'ACCI\u00D3N SUGERIDA']], body: final_int.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 8 } }); 
-                    curY = doc.lastAutoTable.finalY + 10; 
-                }
-
-                // Sección 4: Criterios de Beers (Tabla Completa)
-                if(final_beers.length) { 
-                    doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS 2023 (RIESGO EN EL ANCIANO)", 15, curY); 
-                    doc.autoTable({ startY: curY + 5, head: [['MEDICAMENTO(S)', 'RIESGO GERI\u00C1TRICO', 'ACCI\u00D3N SUGERIDA']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 8 } }); 
-                }
+                if(flagTriple) { doc.setTextColor(185, 28, 28); doc.setFontSize(11); doc.text("ALERTA: TRIPLE WHAMMY DETECTADO", 15, curY); curY += 5; doc.setFontSize(8); doc.setTextColor(0); doc.text(flagTripleMeds, 15, curY, { maxWidth: 180 }); curY += 12; }
+                if(final_dup.length) { doc.setFontSize(11); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAPÉUTICA", 15, curY); doc.autoTable({ startY: curY+5, head: [['ATC', 'MEDS']], body: final_dup.map(d => [d.grp, d.meds.join(' + ')]), headStyles: {fillColor: [217, 119, 6]} }); curY = doc.lastAutoTable.finalY + 10; }
+                if(final_int.length) { doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_int.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
+                if(final_beers.length) { doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); }
                 
-                // Footer con Responsabilidad y Paginación
                 const pc = doc.internal.getNumberOfPages();
-                for (let i = 1; i <= pc; i++) {
-                    doc.setPage(i); doc.setFontSize(8); doc.setTextColor(150); doc.text(`P\u00E1gina ${i} de ${pc}`, pW - 15, pH - 10, { align: 'right' });
-                    // En la última página, mostrar aviso legal completo
-                    if(i === pc) { 
-                        doc.setFontSize(7); doc.setTextColor(71, 85, 105);
-                        doc.text("AVISO DE RESPONSABILIDAD PROFESIONAL:", 15, pH - 30);
-                        doc.text("Esta aplicaci\u00F3n es una herramienta de apoyo cl\u00EDnico. Toda informaci\u00F3n proporcionada es responsabilidad exclusiva del m\u00E9dico tratante. La responsabilidad final de la prescripci\u00F3n recae en el profesional tratante.", 15, pH - 25, { maxWidth: 185 }); 
-                    }
-                }
-                doc.save(`Vigilancia_${pac.replace(/\s+/g, '_')}.pdf`);
-                addLog("PDF Generado.");
-            } catch(e) { debug("Error PDF Completo: " + e.message); }
+                for (let i = 1; i <= pc; i++) { doc.setPage(i); doc.setFontSize(7); doc.text(`Página ${i} de ${pc}`, pW - 15, pH - 10, { align: 'right' }); if(i === pc) doc.text("Aviso: Herramienta de apoyo clínico. Responsabilidad del profesional tratante[cite: 9, 10].", 15, pH - 20, { maxWidth: 185 }); }
+                
+                doc.save(`Vigilancia_${pac}.pdf`);
+                // AVISO VISUAL DE DESCARGA
+                alert("¡REPORTE GENERADO! El archivo se ha guardado en tu carpeta de 'Descargas'.");
+                addLog("PDF Generado y Guardado.");
+            } catch(e) { alert("Error PDF: " + e.message); }
         }
     </script>
 </body>
