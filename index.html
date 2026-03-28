@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v56.73</title>
+    <title>Vigilancia Móvil v56.74</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,6 @@
         #sugCont { max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); position: absolute; width: 100%; z-index: 100; background: white; border: 1px solid #e2e8f0; }
         .sug-item { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 13px; font-weight: 600; color: #1e293b; display: block; line-height: 1.2; }
         .med-row { background: white; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; }
-        .med-name { font-weight: 800; font-size: 13px; color: #1e293b; }
         .badge-count { background: #4338ca; color: white; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 900; margin-left: 8px; }
         .sync-status { font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
         #logPanel { font-family: monospace; font-size: 9px; padding: 10px; background: #334155; color: #f1f5f9; border-radius: 10px; margin-top: 20px; max-height: 100px; overflow-y: auto; }
@@ -23,26 +22,23 @@
 <body class="min-h-screen pb-32">
 
     <div id="welcomeScreen" class="fixed inset-0 bg-indigo-950 flex items-center justify-center p-6 z-[9999]">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-emerald-500">
+        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 overflow-hidden">
             <div class="bg-indigo-900 p-8 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-2xl font-black uppercase italic tracking-tighter">Vigilancia Móvil</h1>
-                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 italic">v56.73 • ULTRA SAFE</p>
+                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 italic">v56.74 • EDICIÓN PRECISIÓN</p>
             </div>
-            <div class="p-8 space-y-4">
-                <div class="p-4 bg-red-50 rounded-2xl border-2 border-red-100">
-                    <h3 class="text-[12px] font-black text-red-700 uppercase mb-2 text-center">🛑 AVISO LEGAL Y RESPONSABILIDAD</h3>
-                    <p class="text-[10px] text-red-900 leading-tight italic text-justify">
-                        Esta aplicación es una herramienta de apoyo clínico. Toda información proporcionada es responsabilidad exclusiva del médico tratante.
-                    </p>
-                </div>
-                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ACEPTAR Y ENTRAR</button>
+            <div class="p-8 space-y-4 text-center">
+                <p class="text-[10px] text-red-900 leading-tight italic bg-red-50 p-4 rounded-2xl border-2 border-red-100">
+                    Herramienta de apoyo clínico para profesionales de la salud. La responsabilidad final de la prescripción es del médico tratante.
+                </p>
+                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ENTRAR</button>
             </div>
         </div>
     </div>
 
     <header class="bg-indigo-950 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.73</h1>
-        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">offline</div>
+        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.74</h1>
+        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
     </header>
 
     <main class="p-4 space-y-6">
@@ -50,19 +46,19 @@
             <h2 class="text-[10px] font-black text-indigo-900 uppercase italic mb-4">1. Sincronización</h2>
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 text-center">
-                    <label class="block text-[8px] font-black mb-2 uppercase text-indigo-900">Meds CSV</label>
+                    <label class="block text-[8px] font-black mb-2 uppercase">Meds CSV</label>
                     <input type="file" id="csvMeds" accept=".csv" class="text-[7px] w-full">
                 </div>
                 <div class="p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 text-center">
-                    <label class="block text-[8px] font-black mb-2 uppercase text-indigo-900">Reglas CSV</label>
+                    <label class="block text-[8px] font-black mb-2 uppercase">Reglas CSV</label>
                     <input type="file" id="csvInts" accept=".csv" class="text-[7px] w-full">
                 </div>
             </div>
-            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg">Cargar y Guardar Datos</button>
+            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg italic">Guardar Bases</button>
         </section>
 
         <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200">
-            <h2 class="text-[10px] font-black text-indigo-900 uppercase mb-3 italic">2. Datos del Paciente</h2>
+            <h2 class="text-[10px] font-black text-indigo-900 uppercase mb-3 italic">2. Datos de Paciente</h2>
             <input type="text" id="pNombre" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3 text-sm font-black uppercase outline-none mb-3" placeholder="Nombre completo">
             <div class="flex gap-2">
                 <input type="number" id="pEdad" class="w-1/2 bg-slate-100 border-2 border-slate-200 rounded-xl p-3 text-sm font-black" placeholder="Edad">
@@ -73,13 +69,13 @@
         <section class="space-y-4 relative">
             <div class="flex justify-between items-center px-1">
                 <div class="flex items-center">
-                    <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripción Actual</h2>
+                    <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripción</h2>
                     <span id="medCount" class="badge-count">0</span>
                 </div>
-                <button onclick="confirmarLimpiar()" class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase shadow-md">Limpiar</button>
+                <button onclick="limpiarManual()" class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase shadow-md">Limpiar</button>
             </div>
             <div class="relative">
-                <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Escriba fármaco..." autocomplete="off">
+                <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Buscar fármaco..." autocomplete="off">
                 <div id="sugCont" class="hidden"></div>
             </div>
             <div id="listaSeleccionados" class="mt-4"></div>
@@ -113,37 +109,12 @@
         let DB_MEDS = []; let DB_RULES = []; let seleccionados = [];
         let final_dup = []; let final_int = []; let final_beers = []; let flagTriple = false; let flagTripleMeds = "";
 
-        // REGISTRO SW REFORZADO PARA S25 Y IPHONE
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                .then(reg => {
-                    console.log('SW activo');
-                    reg.update(); // Forzar actualización en cada carga
-                })
-                .catch(err => console.log('Error SW:', err));
-            });
-        }
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').then(reg => reg.update()); }
 
-        // CARGA OFFLINE REFORZADA
         window.onload = () => {
-            try {
-                const m = localStorage.getItem('pwa_meds');
-                const r = localStorage.getItem('pwa_rules');
-                if(m && r) {
-                    DB_MEDS = JSON.parse(m);
-                    DB_RULES = JSON.parse(r);
-                    // Validar integridad básica de los datos cargados
-                    if(DB_MEDS.length > 0 && DB_RULES.length > 0) {
-                        actualizarEstadoUI();
-                    } else {
-                        throw new Error("Datos corruptos");
-                    }
-                }
-            } catch(e) {
-                document.getElementById('status').innerText = "Sincronizar!";
-                document.getElementById('status').className = "sync-status bg-red-600 text-white";
-            }
+            const m = localStorage.getItem('pwa_meds');
+            const r = localStorage.getItem('pwa_rules');
+            if(m && r) { DB_MEDS = JSON.parse(m); DB_RULES = JSON.parse(r); actualizarEstadoUI(); }
         };
 
         function addLog(msg) {
@@ -172,10 +143,7 @@
                     if(c.length >= 2 && c[0]) {
                         const orig = c[0].toUpperCase();
                         const norm = orig.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                        const atc = (c[1] || "").toUpperCase();
-                        // BLINDAJE ATC: Evitar ATCs de 1 o 2 letras malformados
-                        if(atc.length < 3) return; 
-                        DB_MEDS.push({ name: orig, norm: norm, atc: atc });
+                        DB_MEDS.push({ name: orig, norm: norm, atc: (c[1] || "").toUpperCase() });
                     }
                 });
 
@@ -186,15 +154,13 @@
                 lI.forEach(l => {
                     const c = l.split(sepI).map(v => (v || "").replace(/"/g, '').trim());
                     if(c.length >= 4 && c[0] && !c[0].toUpperCase().includes("ATC")) {
-                        // BLINDAJE ATC REGLAS: Ambos ATC deben ser válidos
-                        if(c[0].length < 3 || c[1].length < 3) return;
                         DB_RULES.push({ a: c[0].toUpperCase(), b: c[1].toUpperCase(), msg: c[2], act: c[3] });
                     }
                 });
                 localStorage.setItem('pwa_meds', JSON.stringify(DB_MEDS));
                 localStorage.setItem('pwa_rules', JSON.stringify(DB_RULES));
                 actualizarEstadoUI();
-                alert("Sincronización Exitosa.");
+                alert("Bases sincronizadas.");
             } catch(e) { alert("Error carga: " + e.message); }
         }
 
@@ -209,57 +175,28 @@
             } else { cont.classList.add('hidden'); }
         }
 
-        // FIX BUG PRECISIÓN: Evitar duplicados en la selección
         function selectMed(name, atc) {
-            const atcClean = (atc || "S/N").toUpperCase();
-            // Comprobación de unicidad
-            if(seleccionados.some(s => s.name === name && s.atc === atcClean)) {
-                alert("El fármaco ya está seleccionado.");
-                document.getElementById('farmaInput').value = "";
-                document.getElementById('sugCont').classList.add('hidden');
-                return;
-            }
+            if(seleccionados.some(s => s.name === name)) return alert("Ya seleccionado.");
+            seleccionados.push({ name, atc: (atc || "S/N") });
+            renderLista();
+        }
 
-            seleccionados.push({ name, atc: atcClean });
+        function renderLista() {
             document.getElementById('medCount').innerText = seleccionados.length;
             const cont = document.getElementById('listaSeleccionados');
-            cont.innerHTML += `<div class="med-row">
-                <div class="med-info"><span class="med-name text-indigo-950 font-black">${name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${atcClean}</span></div>
-                <button onclick="borrarFármacoDOM(this)" class="text-red-500 font-bold p-2">✕</button>
-            </div>`;
-            document.getElementById('farmaInput').value = "";
-            document.getElementById('sugCont').classList.add('hidden');
+            cont.innerHTML = seleccionados.map((m, i) => `
+                <div class="med-row">
+                    <div class="med-info"><span class="med-name">${m.name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${m.atc}</span></div>
+                    <button onclick="seleccionados.splice(${i},1); renderLista();" class="text-red-500 font-bold p-2">✕</button>
+                </div>`).join('');
         }
 
-        function borrarFármacoDOM(btn) {
-            btn.parentElement.remove();
-            recontar();
-        }
-
-        function recontar() {
-            const listaDOM = document.getElementById('listaSeleccionados').querySelectorAll('.med-info');
-            seleccionados = [];
-            listaDOM.forEach(div => {
-                const name = div.querySelector('.med-name').innerText;
-                const atc = div.querySelector('span[class*="text-emerald-600"]').innerText;
-                seleccionados.push({name, atc});
-            });
-            document.getElementById('medCount').innerText = seleccionados.length;
-        }
-
-        // FIX BUG BOTÓN BORRAR: Reset manual completo para iOS
-        function confirmarLimpiar() {
+        function limpiarManual() {
             if(confirm("¿Limpiar todo?")) {
-                seleccionados = [];
-                document.getElementById('medCount').innerText = "0";
-                document.getElementById('listaSeleccionados').innerHTML = "";
-                document.getElementById('pNombre').value = "";
-                document.getElementById('pEdad').value = "";
-                document.getElementById('pPeso').value = "";
-                document.getElementById('farmaInput').value = "";
-                document.getElementById('resultados').classList.add('hidden');
-                document.getElementById('debugLog').innerHTML = "";
-                // location.reload() es ignorado en PWA iOS.
+                seleccionados = []; renderLista();
+                document.getElementById('pNombre').value = ""; document.getElementById('pEdad').value = ""; document.getElementById('pPeso').value = "";
+                document.getElementById('resultados').classList.add('hidden'); document.getElementById('btnPdf').classList.add('hidden');
+                document.getElementById('logPanel').innerHTML = "";
             }
         }
 
@@ -268,7 +205,7 @@
         function ejecutarAnalisis() {
             try {
                 if(seleccionados.length < 1) return;
-                recontar(); // Sincronizar 'seleccionados' con el DOM
+                addLog("Iniciando Análisis v56.74...");
                 document.getElementById('resultados').classList.remove('hidden');
                 document.getElementById('btnPdf').classList.remove('hidden');
                 
@@ -284,60 +221,51 @@
                 final_dup = []; final_int = []; final_beers = []; flagTriple = false;
                 let hallazgos = {};
 
-                // --- FIX BUG SEGURIDAD: BLINDAJE TRIPLE WHAMMY ---
-                // Salbutamol (R03) y Budesonida (R03) JAMÁS deben clasificar aquí.
-                // Verificamos por familia ATC estricta (primeras 3 letras).
-                const medsAINE = seleccionados.filter(m => m.atc && m.atc.startsWith("M01A"));
-                const medsACEI = seleccionados.filter(m => m.atc && (m.atc.startsWith("C09A") || m.atc.startsWith("C09B") || m.atc.startsWith("C09C") || m.atc.startsWith("C09D")));
-                const medsDIUR = seleccionados.filter(m => m.atc && (m.atc.startsWith("C03") || m.atc.startsWith("C09B") || m.atc.startsWith("C09D")));
+                // 1. Triple Whammy
+                const medsAINE = seleccionados.filter(m => m.atc.startsWith("M01A"));
+                const medsACEI = seleccionados.filter(m => m.atc.startsWith("C09"));
+                const medsDIUR = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.startsWith("C09B") || m.atc.startsWith("C09D"));
                 
                 if(medsAINE.length && medsACEI.length && medsDIUR.length) {
                     flagTriple = true;
-                    // Asegurar nombres únicos para la alerta
-                    const uA = [...new Set(medsAINE.map(m=>m.name))];
-                    const uC = [...new Set(medsACEI.map(m=>m.name))];
-                    const uD = [...new Set(medsDIUR.map(m=>m.name))];
-                    flagTripleMeds = `AINE: ${uA.join(', ')} | IECA/ARAII: ${uC.join(', ')} | DIUR: ${uD.join(', ')}`;
-                    aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 TRIPLE TRÍADA (WHAMMY) DETECTADO<br>${flagTripleMeds}</div>`;
+                    flagTripleMeds = `AINE: ${medsAINE.map(m=>m.name).join(', ')} | IECA: ${medsACEI.map(m=>m.name).join(', ')} | DIUR: ${medsDIUR.map(m=>m.name).join(', ')}`;
+                    aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 TRIPLE WHAMMY DETECTADO<br>${flagTripleMeds}</div>`;
                     aT.classList.remove('hidden');
                 }
 
-                // 2. Duplicidad
+                // --- FIX BUG DUPLICIDAD: Refinado a 4 caracteres ---
                 let grps = {}; 
                 seleccionados.forEach(m => { 
-                    if(m.atc && m.atc.length >= 3) { 
-                        let p = m.atc.substring(0,3); 
-                        // FIX BUG PRECISIÓN: Solo duplicar si son AINEs (M01A) o Corticoides (H02A) etc.
-                        // substring(0,3) "H02" vs "M01" ya es diferente, Artritis screenshot sugiere datos CSV corruptos.
-                        // La unicidad en selectMed() ya resuelve nombres repetidos.
+                    if(m.atc.length >= 4) {
+                        let p = m.atc.substring(0,4); // Antes era substring(0,3)
                         if(!grps[p]) grps[p]=[]; grps[p].push(m.name); 
-                    } 
+                    }
                 });
                 for(let p in grps) if(grps[p].length > 1) { 
-                    const uniqueNames = [...new Set(grps[p])];
-                    if(uniqueNames.length > 1) { // Solo si hay fármacos distintos en el mismo grupo
-                        final_dup.push({ grp: p, meds: uniqueNames }); 
-                        rD.innerHTML += `<p>• GRUPO ${p}: ${uniqueNames.join(' + ')}</p>`;
-                        document.getElementById('boxDup').classList.remove('hidden');
-                    }
+                    final_dup.push({ grp: p, meds: grps[p] }); 
+                    rD.innerHTML += `<p>• GRUPO ${p}: ${grps[p].join(' + ')}</p>`;
+                    document.getElementById('boxDup').classList.remove('hidden');
                 }
 
-                // 3. Interacciones
+                // --- FIX BUG REGLAS: Búsqueda Bidireccional ---
                 if(DB_RULES.length > 0) {
                     for(let ru of DB_RULES) {
                         for(let m1 of seleccionados) {
-                            if(!m1.atc || m1.atc === "S/N") continue;
-                            if(ru.a === ru.b) {
-                                // Regla forzada para un fármaco
-                                if(m1.atc.startsWith(ru.a)) {
-                                    const k = m1.name; if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = ru;
-                                }
-                            } else {
-                                // Regla para dos fármacos distintos
-                                for(let m2 of seleccionados) {
-                                    if(m1.name === m2.name || !m2.atc || m2.atc === "S/N") continue;
-                                    if(m1.atc.startsWith(ru.a) && m2.atc.startsWith(ru.b)) {
-                                        const k = `${m1.name} + ${m2.name}`; if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = ru;
+                            // Match Fármaco 1 (Coincidencia parcial o total)
+                            const match1 = m1.atc.startsWith(ru.a) || ru.a.startsWith(m1.atc);
+                            if(match1) {
+                                if(ru.a === ru.b) {
+                                    // Regla de un solo fármaco
+                                    const k = m1.name;
+                                    if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = ru;
+                                } else {
+                                    // Regla de dos fármacos
+                                    for(let m2 of seleccionados) {
+                                        const match2 = m2.atc.startsWith(ru.b) || ru.b.startsWith(m2.atc);
+                                        if(m1.name !== m2.name && match2) {
+                                            const k = `${m1.name} + ${m2.name}`;
+                                            if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = ru;
+                                        }
                                     }
                                 }
                             }
@@ -350,44 +278,41 @@
                     const msgU = (h.msg || "").toUpperCase();
                     if(msgU.includes("BEERS")) {
                         final_beers.push({ meds: key, desc: h.msg, act: h.act });
-                        rB.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-blue-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-blue-600 font-black">ACCIÓN: ${h.act}</p></div>`;
+                        rB.innerHTML += `<div class="mb-2 border-b pb-1 text-[10px] font-bold"><b>${key}</b><br>${h.msg}<br><span class="text-blue-600 uppercase">ACCIÓN: ${h.act}</span></div>`;
                         document.getElementById('boxBeers').classList.remove('hidden');
                     } else {
                         final_int.push({ meds: key, desc: h.msg, act: h.act });
-                        rI.innerHTML += `<div class="mb-3 border-b pb-2 text-[10px] font-bold"><p class="text-red-700 uppercase">${key}</p><p class="text-slate-700">${h.msg}</p><p class="text-red-600 font-black">ACCIÓN: ${h.act}</p></div>`;
+                        rI.innerHTML += `<div class="mb-2 border-b pb-1 text-[10px] font-bold"><b>${key}</b><br>${h.msg}<br><span class="text-red-600 uppercase">ACCIÓN: ${h.act}</span></div>`;
                         document.getElementById('boxInt').classList.remove('hidden');
                     }
                 }
-                addLog("Análisis completado.");
-            } catch(e) { addLog(`Error Análisis: ${e.message}`); }
+                addLog("Paso 3: Interacciones OK");
+            } catch(e) { addLog(`Error: ${e.message}`); }
         }
 
         function descargarReporte() {
             try {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
-                const pW = doc.internal.pageSize.getWidth(); const pH = doc.internal.pageSize.getHeight();
+                const doc = new jsPDF({ format: 'letter' });
+                const pW = doc.internal.pageSize.getWidth();
                 let pac = (document.getElementById('pNombre').value || "ANÓNIMO").toUpperCase();
                 
                 doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 35, 'F');
-                doc.setTextColor(255); doc.setFontSize(16); doc.text("REPORTE DE VIGILANCIA FARMACOLÓGICA", 15, 22);
+                doc.setTextColor(255); doc.setFontSize(18); doc.text("REPORTE DE VIGILANCIA FARMACOLÓGICA", 15, 22);
                 doc.setTextColor(0); doc.setFontSize(10);
-                doc.text(`Paciente: ${pac} | Edad: ${document.getElementById('pEdad').value || "--"} | Peso: ${document.getElementById('pPeso').value || "--"}`, 15, 45);
+                doc.text(`Paciente: ${pac} | Edad: ${document.getElementById('pEdad').value || "--"}`, 15, 45);
 
                 doc.autoTable({ startY: 55, head: [['MEDICAMENTO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 8 } });
                 let curY = doc.lastAutoTable.finalY + 10;
 
-                if(flagTriple) { doc.setTextColor(185, 28, 28); doc.setFontSize(11); doc.text("ALERTA: TRIPLE WHAMMY DETECTADO", 15, curY); curY += 5; doc.setFontSize(8); doc.setTextColor(0); doc.text(flagTripleMeds, 15, curY, { maxWidth: 180 }); curY += 12; }
-                if(final_dup.length) { doc.setFontSize(11); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAPÉUTICA", 15, curY); doc.autoTable({ startY: curY+5, head: [['ATC', 'MEDS']], body: final_dup.map(d => [d.grp, d.meds.join(' + ')]), headStyles: {fillColor: [217, 119, 6]} }); curY = doc.lastAutoTable.finalY + 10; }
-                if(final_int.length) { doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_int.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
-                if(final_beers.length) { doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); }
-                
-                const pc = doc.internal.getNumberOfPages();
-                for (let i = 1; i <= pc; i++) { doc.setPage(i); doc.setFontSize(7); doc.text(`Página ${i} de ${pc}`, pW - 15, pH - 10, { align: 'right' }); if(i === pc) doc.text("Aviso: Herramienta de apoyo clínico. Responsabilidad del profesional tratante.", 15, pH - 20, { maxWidth: 185 }); }
+                if(flagTriple) { doc.setTextColor(185, 28, 28); doc.text("ALERTA: TRIPLE WHAMMY DETECTADO", 15, curY); curY += 5; doc.setFontSize(8); doc.text(flagTripleMeds, 15, curY, { maxWidth: 180 }); curY += 12; }
+                if(final_dup.length) { doc.setFontSize(10); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAPÉUTICA", 15, curY); doc.autoTable({ startY: curY+5, head: [['ATC', 'MEDS']], body: final_dup.map(d => [d.grp, d.meds.join(' + ')]), headStyles: {fillColor: [217, 119, 6]} }); curY = doc.lastAutoTable.finalY + 10; }
+                if(final_int.length) { doc.setFontSize(10); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_int.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
+                if(final_beers.length) { doc.setFontSize(10); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); }
                 
                 doc.save(`Vigilancia_${pac}.pdf`);
                 alert("¡REPORTE GENERADO! Verifique su carpeta de 'Descargas'.");
-            } catch(e) { alert("Error PDF: " + e.message); }
+            } catch(e) { addLog(`Error PDF: ${e.message}`); }
         }
     </script>
 </body>
