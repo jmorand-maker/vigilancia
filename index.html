@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v56.78</title>
+    <title>Vigilancia Móvil v56.79</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,22 +24,22 @@
         <div class="bg-white w-full max-w-lg max-h-[85vh] rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
             <div class="bg-indigo-900 p-6 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-2xl font-black uppercase italic">Vigilancia Móvil</h1>
-                <p class="text-[10px] text-emerald-400 font-bold uppercase mt-1">v56.78 • RESTAURACIÓN TOTAL</p>
+                <p class="text-[10px] text-emerald-400 font-bold uppercase mt-1">v56.79 • ESTABILIDAD iPad</p>
             </div>
             <div class="p-8 overflow-y-auto space-y-6">
                 <div class="p-6 bg-red-50 rounded-3xl border-2 border-red-100 shadow-inner text-justify">
-                    <h3 class="text-xs font-black text-red-700 uppercase mb-3 text-center">🛑 RESPONSABILIDAD PROFESIONAL</h3>
+                    <h3 class="text-xs font-black text-red-700 uppercase mb-3 text-center">🛑 AVISO LEGAL</h3>
                     <p class="text-[11px] text-red-900 leading-relaxed italic">
-                        Esta aplicación es una herramienta de apoyo a la decisión clínica y no sustituye el juicio profesional. Toda información proporcionada es responsabilidad exclusiva del médico tratante. La exactitud de las alertas depende de la calidad de las bases CSV cargadas por el usuario.
+                        Esta aplicación es una herramienta de apoyo clínico. La responsabilidad final de la prescripción es del médico tratante. Verifique siempre los resultados.
                     </p>
                 </div>
-                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-950 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ENTRAR Y ACEPTAR</button>
+                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ACEPTAR</button>
             </div>
         </div>
     </div>
 
     <header class="bg-indigo-950 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.78</h1>
+        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.79</h1>
         <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
     </header>
 
@@ -50,7 +50,7 @@
                 <input type="file" id="csvMeds" class="text-[7px]">
                 <input type="file" id="csvInts" class="text-[7px]">
             </div>
-            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-3 rounded-xl font-black text-[10px] uppercase">Sincronizar Bases</button>
+            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-3 rounded-xl font-black text-[10px] uppercase italic">Sincronizar Bases</button>
         </section>
 
         <section class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
@@ -68,7 +68,7 @@
                 <button onclick="limpiarManual()" class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase">Limpiar</button>
             </div>
             <div class="relative">
-                <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Escriba fármaco..." autocomplete="off">
+                <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Buscar fármaco..." autocomplete="off">
                 <div id="sugCont" class="hidden"></div>
             </div>
             <div id="listaSeleccionados" class="mt-4"></div>
@@ -77,15 +77,15 @@
         <div id="resultados" class="hidden space-y-4 pb-24">
             <div id="alertaTriple" class="hidden"></div>
             <div id="boxDup" class="bg-white rounded-3xl p-5 border-l-8 border-orange-500 shadow-lg hidden">
-                <h3 class="text-orange-600 font-black text-[10px] uppercase mb-3">⚠️ Duplicidad Terapéutica</h3>
+                <h3 class="text-orange-600 font-black text-[10px] uppercase mb-3 italic">⚠️ Duplicidad Terapéutica</h3>
                 <div id="resDup" class="text-xs space-y-1 font-bold"></div>
             </div>
             <div id="boxInt" class="bg-white rounded-3xl p-5 border-l-8 border-red-600 shadow-lg hidden">
-                <h3 class="text-red-600 font-black text-[10px] uppercase mb-3">🛑 Interacciones Medicamentosas</h3>
+                <h3 class="text-red-600 font-black text-[10px] uppercase mb-3 italic">🛑 Interacciones Medicamentosas</h3>
                 <div id="resInt" class="text-xs space-y-3 font-medium"></div>
             </div>
             <div id="boxBeers" class="bg-white rounded-3xl p-5 border-l-8 border-blue-600 shadow-lg hidden">
-                <h3 class="text-blue-600 font-black text-[10px] uppercase mb-3">📘 Criterios de Beers 2023</h3>
+                <h3 class="text-blue-600 font-black text-[10px] uppercase mb-3 italic">📘 Criterios de Beers 2023</h3>
                 <div id="resBeers" class="text-xs space-y-3 font-medium"></div>
             </div>
         </div>
@@ -93,7 +93,7 @@
 
     <footer class="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md flex gap-3 border-t border-slate-200 z-40">
         <button onclick="ejecutarAnalisis()" class="flex-1 bg-indigo-950 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl italic">Analizar</button>
-        <button id="btnPdf" onclick="descargarReporte()" class="hidden bg-red-600 text-white w-28 rounded-2xl flex items-center justify-center font-black uppercase text-[10px] shadow-lg italic">Reporte PDF</button>
+        <button id="btnPdf" onclick="descargarReporte()" class="hidden bg-red-600 text-white w-28 rounded-2xl flex items-center justify-center font-black uppercase text-[10px] shadow-lg">Reporte PDF</button>
     </footer>
 
     <script>
@@ -164,7 +164,7 @@
             const cont = document.getElementById('listaSeleccionados');
             cont.innerHTML = seleccionados.map((m, i) => `
                 <div class="med-row">
-                    <div class="med-info"><span class="med-name font-black uppercase">${m.name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${m.atc}</span></div>
+                    <div class="med-info"><span class="med-name font-black uppercase text-indigo-900">${m.name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${m.atc}</span></div>
                     <button onclick="seleccionados.splice(${i},1); renderLista();" class="text-red-500 font-bold p-2">✕</button>
                 </div>`).join('');
         }
@@ -207,29 +207,55 @@
                 aT.classList.remove('hidden');
             }
 
-            // 2. Duplicidad (4 Chars)
+            // 2. Duplicidad Terapéutica (REVERTIDO A 3 CARACTERES PARA C03)
             let grps = {}; 
-            seleccionados.forEach(m => { let p = m.atc.substring(0,4); if(!grps[p]) grps[p]=[]; grps[p].push(m.name); });
+            seleccionados.forEach(m => { 
+                if(m.atc.length >= 3) {
+                    let p = m.atc.substring(0,3); 
+                    if(!grps[p]) grps[p]=[]; grps[p].push(m.name); 
+                }
+            });
             for(let p in grps) if(grps[p].length > 1) { 
-                final_dup.push({ grp: p, meds: grps[p] }); 
-                rD.innerHTML += `<p>• GRUPO ${p}: ${grps[p].join(' + ')}</p>`;
-                document.getElementById('boxDup').classList.remove('hidden');
+                const uniqueNames = [...new Set(grps[p])];
+                if(uniqueNames.length > 1) {
+                    final_dup.push({ grp: p, meds: uniqueNames }); 
+                    rD.innerHTML += `<p>• GRUPO ${p}: ${uniqueNames.join(' + ')}</p>`;
+                    document.getElementById('boxDup').classList.remove('hidden');
+                }
             }
 
-            // 3. Reglas (Beers e Interacciones)
+            // --- MOTOR DE ANÁLISIS MEJORADO v56.79 ---
             for(let ru of DB_RULES) {
                 for(let m1 of seleccionados) {
-                    const match1 = m1.atc.startsWith(ru.a) || ru.a.startsWith(m1.atc);
+                    const match1 = m1.atc.startsWith(ru.a);
                     if(match1) {
                         if(ru.a === ru.b) {
-                            const k = `BEERS_${m1.name}_${ru.msg.substring(0,10)}`;
-                            if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = { ...ru, disp: m1.name };
+                            // CASO 1: Regla de un solo fármaco (BEERS)
+                            if(ru.msg.toUpperCase().includes("BEERS")) {
+                                const k = `BEERS_${m1.name}_${ru.msg.substring(0,10)}`;
+                                if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) {
+                                    hallazgos[k] = { ...ru, disp: m1.name };
+                                }
+                            } else {
+                                // CASO 2: Regla de la misma familia (Ej: Doble Antidepresivo)
+                                // OBLIGATORIO: Debe haber un segundo fármaco distinto de la misma familia
+                                for(let m2 of seleccionados) {
+                                    if(m1.name !== m2.name && m2.atc.startsWith(ru.b)) {
+                                        const k = `INT_${m1.name}_${m2.name}`;
+                                        if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) {
+                                            hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}` };
+                                        }
+                                    }
+                                }
+                            }
                         } else {
+                            // CASO 3: Interacción entre familias distintas
                             for(let m2 of seleccionados) {
-                                const match2 = m2.atc.startsWith(ru.b) || ru.b.startsWith(m2.atc);
-                                if(m1.name !== m2.name && match2) {
+                                if(m1.name !== m2.name && m2.atc.startsWith(ru.b)) {
                                     const k = `INT_${m1.name}_${m2.name}`;
-                                    if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}` };
+                                    if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) {
+                                        hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}` };
+                                    }
                                 }
                             }
                         }
@@ -251,7 +277,6 @@
             }
         }
 
-        // --- REPORTE PDF RESTAURADO AL 100% ---
         function descargarReporte() {
             try {
                 const { jsPDF } = window.jspdf;
@@ -261,52 +286,21 @@
                 let edad = document.getElementById('pEdad').value || "--";
                 let peso = document.getElementById('pPeso').value || "--";
                 
-                // Encabezado Profesional
                 doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 35, 'F');
                 doc.setTextColor(255); doc.setFontSize(18); doc.text("REPORTE DE VIGILANCIA FARMACOLÓGICA", 15, 22);
                 doc.setTextColor(0); doc.setFontSize(10);
                 doc.text(`Paciente: ${pac} | Edad: ${edad} Años | Peso: ${peso} kg`, 15, 45);
 
-                // Tabla de Medicamentos
-                doc.autoTable({ 
-                    startY: 50, 
-                    head: [['NOMBRE GENÉRICO', 'CÓDIGO ATC']], 
-                    body: seleccionados.map(m => [m.name, m.atc]), 
-                    headStyles: { fillColor: [71, 85, 105] }, 
-                    styles: { fontSize: 8 } 
-                });
-                
+                doc.autoTable({ startY: 50, head: [['NOMBRE GENÉRICO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 8 } });
                 let curY = doc.lastAutoTable.finalY + 10;
 
-                // Sección Triple Whammy
-                if(flagTriple) { 
-                    doc.setTextColor(185, 28, 28); doc.setFontSize(11); doc.text("ALERTA: TRIPLE WHAMMY DETECTADO", 15, curY); 
-                    curY += 5; doc.setFontSize(8); doc.setTextColor(0); doc.text(flagTripleMeds, 15, curY, { maxWidth: 180 }); 
-                    curY += 12; 
-                }
-
-                // Sección Duplicidad
-                if(final_dup.length) { 
-                    doc.setFontSize(11); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAPÉUTICA", 15, curY); 
-                    doc.autoTable({ startY: curY+5, head: [['ATC GRUPO', 'MEDICAMENTOS']], body: final_dup.map(d => [d.grp, d.meds.join(' + ')]), headStyles: {fillColor: [217, 119, 6]}, styles: {fontSize: 8} }); 
-                    curY = doc.lastAutoTable.finalY + 10; 
-                }
-
-                // Sección Interacciones
-                if(final_int.length) { 
-                    doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES MEDICAMENTOSAS", 15, curY); 
-                    doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO CLÍNICO', 'ACCIÓN']], body: final_int.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); 
-                    curY = doc.lastAutoTable.finalY + 10; 
-                }
-
-                // Sección Beers
-                if(final_beers.length) { 
-                    doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS 2023", 15, curY); 
-                    doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO GERIÁTRICO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); 
-                }
+                if(flagTriple) { doc.setTextColor(185, 28, 28); doc.text("ALERTA: TRIPLE WHAMMY DETECTADO", 15, curY); curY += 5; doc.setFontSize(8); doc.setTextColor(0); doc.text(flagTripleMeds, 15, curY, { maxWidth: 180 }); curY += 12; }
+                if(final_dup.length) { doc.setFontSize(11); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAPÉUTICA", 15, curY); doc.autoTable({ startY: curY+5, head: [['ATC', 'MEDICAMENTOS']], body: final_dup.map(d => [d.grp, d.meds.join(' + ')]), headStyles: {fillColor: [217, 119, 6]}, styles: {fontSize: 8} }); curY = doc.lastAutoTable.finalY + 10; }
+                if(final_int.length) { doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES MEDICAMENTOSAS", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_int.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
+                if(final_beers.length) { doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS 2023", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); }
                 
                 doc.save(`Vigilancia_${pac}.pdf`);
-                alert("¡REPORTE GENERADO CON ÉXITO!");
+                alert("¡REPORTE GENERADO!");
             } catch(e) { alert("Error PDF: " + e.message); }
         }
     </script>
