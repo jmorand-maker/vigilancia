@@ -1,7 +1,6 @@
-// 1. Cambiamos el nombre de la caché para forzar al S25 Ultra a borrar lo anterior
-const CACHE_NAME = 'vigilancia-v56-72'; 
+// SW v3: Limpieza Profunda y Refuerzo Offline para iOS y S25
+const CACHE_NAME = 'vigilancia-ultra-safe-v3'; 
 
-// 2. Lista de archivos esenciales para que funcione offline
 const ASSETS = [
   './',
   './index.html',
@@ -11,42 +10,43 @@ const ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js'
 ];
 
-// EVENTO DE INSTALACIÓN: Descarga los archivos nuevos
+// INSTALACIÓN: Cachear todo de inmediato
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log('SW: Cacheando archivos nuevos...');
+      console.log('SW v3: Cacheando Archivos...');
       return cache.addAll(ASSETS);
     })
   );
-  self.skipWaiting(); // Fuerza a este SW a tomar el control de inmediato
+  self.skipWaiting(); // Forzar activación
 });
 
-// EVENTO DE ACTIVACIÓN: Borra TODAS las cachés viejas
+// ACTIVACIÓN: Borrar CUALQUIER caché vieja agresivamente
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log('SW: Borrando caché antigua:', key);
+            console.log('SW v3: Borrando caché antigua:', key);
             return caches.delete(key);
           }
         })
       );
     })
   );
-  return self.clients.claim(); // Toma el control de las pestañas abiertas
+  // Toma el control de las pestañas abiertas de inmediato
+  return self.clients.claim(); 
 });
 
-// EVENTO FETCH: Sirve los archivos desde la caché si no hay internet
+// ESTRATEGIA FETCH: Prioridad Caché (para Offline confiable)
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then(response => {
-      // Si está en caché, lo devuelve; si no, lo busca en internet
+      // Devuelve caché si existe, sino va a red
       return response || fetch(e.request);
     }).catch(() => {
-      // Si falla todo (offline total y no está en caché), intenta devolver la raíz
+      // Fallback para navegación offline si no está en caché
       if (e.request.mode === 'navigate') {
         return caches.match('./index.html');
       }
