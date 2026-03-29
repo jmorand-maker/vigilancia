@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v56.84</title>
+    <title>Vigilancia Móvil v56.85</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,6 @@
         #sugCont { max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); position: absolute; width: 100%; z-index: 100; background: white; border: 1px solid #e2e8f0; }
         .sug-item { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 13px; font-weight: 600; color: #1e293b; display: block; line-height: 1.2; }
         .med-row { background: white; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; }
-        .badge-count { background: #4338ca; color: white; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 900; margin-left: 8px; }
         .sync-status { font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
     </style>
 </head>
@@ -24,38 +23,44 @@
         <div class="bg-white w-full max-w-lg max-h-[85vh] rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
             <div class="bg-indigo-900 p-6 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-2xl font-black uppercase italic">Vigilancia Móvil</h1>
-                <p class="text-[10px] text-emerald-400 font-bold uppercase mt-1">v56.84 • PRECISIÓN ATC</p>
+                <p class="text-[10px] text-emerald-400 font-bold uppercase mt-1">v56.85 • RIGOR FARMACOLÓGICO</p>
             </div>
             <div class="p-8 overflow-y-auto space-y-6">
-                <div class="p-6 bg-red-50 rounded-3xl border-2 border-red-100 shadow-inner text-justify">
+                <div class="p-6 bg-red-50 rounded-3xl border-2 border-red-100 text-justify">
                     <h3 class="text-xs font-black text-red-700 uppercase mb-3 text-center">🛑 AVISO LEGAL</h3>
                     <p class="text-[11px] text-red-900 leading-relaxed italic">
                         Esta aplicación es una herramienta de apoyo a la decisión clínica. Toda información proporcionada es responsabilidad exclusiva del médico tratante. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio profesional. La información no sustituye la consulta médica ni el criterio del especialista.
                     </p>
                 </div>
-                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ACEPTAR Y ENTRAR</button>
+                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ACEPTAR</button>
             </div>
         </div>
     </div>
 
     <header class="bg-indigo-950 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.84</h1>
-        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
+        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.85</h1>
+        <div id="status" class="sync-status bg-slate-800 text-slate-400">Offline</div>
     </header>
 
     <main class="p-4 space-y-6">
         <section class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
             <h2 class="text-[10px] font-black text-indigo-900 uppercase italic mb-4">1. Sincronización</h2>
-            <div class="grid grid-cols-2 gap-2 mb-4">
-                <input type="file" id="csvMeds" class="text-[7px]">
-                <input type="file" id="csvInts" class="text-[7px]">
+            <div class="space-y-3 mb-4">
+                <div class="flex flex-col">
+                    <label class="text-[9px] font-black uppercase text-slate-500 mb-1">Medicamentos (CSV)</label>
+                    <input type="file" id="csvMeds" accept=".csv" class="text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-200">
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-[9px] font-black uppercase text-slate-500 mb-1">Reglas/Beers (CSV)</label>
+                    <input type="file" id="csvInts" accept=".csv" class="text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-200">
+                </div>
             </div>
-            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-3 rounded-xl font-black text-[10px] uppercase italic">Sincronizar Bases</button>
+            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-3 rounded-xl font-black text-[10px] uppercase italic">Sincronizar y Guardar</button>
         </section>
 
         <section class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
-            <h2 class="text-[10px] font-black text-indigo-900 uppercase italic mb-3">2. Datos de Paciente</h2>
-            <input type="text" id="pNombre" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none mb-3" placeholder="Nombre Paciente">
+            <h2 class="text-[10px] font-black text-indigo-900 uppercase mb-3">2. Paciente</h2>
+            <input type="text" id="pNombre" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none mb-3" placeholder="Nombre">
             <div class="flex gap-2">
                 <input type="number" id="pEdad" class="w-1/2 bg-slate-100 rounded-xl p-3 text-xs font-black" placeholder="Edad">
                 <input type="number" id="pPeso" class="w-1/2 bg-slate-100 rounded-xl p-3 text-xs font-black" placeholder="Peso (kg)">
@@ -64,47 +69,54 @@
 
         <section class="space-y-4 relative">
             <div class="flex justify-between items-center px-1">
-                <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripción <span id="medCount" class="badge-count">0</span></h2>
+                <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripción</h2>
                 <button onclick="limpiarManual()" class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase shadow-md">Limpiar</button>
             </div>
-            <div class="relative">
-                <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Buscar fármaco..." autocomplete="off">
-                <div id="sugCont" class="hidden"></div>
-            </div>
+            <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Buscar fármaco..." autocomplete="off">
+            <div id="sugCont" class="hidden"></div>
             <div id="listaSeleccionados" class="mt-4"></div>
         </section>
 
         <div id="resultados" class="hidden space-y-4 pb-24">
-            <div id="alertaTriple" class="hidden"></div>
             <div id="boxDup" class="bg-white rounded-3xl p-5 border-l-8 border-orange-500 shadow-lg hidden">
-                <h3 class="text-orange-600 font-black text-[10px] uppercase mb-3">⚠️ Duplicidad Terapéutica</h3>
-                <div id="resDup" class="text-xs space-y-1 font-bold"></div>
+                <h3 class="text-orange-600 font-black text-[10px] uppercase mb-2">⚠️ Duplicidad</h3>
+                <div id="resDup" class="text-[11px] font-bold space-y-1"></div>
             </div>
             <div id="boxInt" class="bg-white rounded-3xl p-5 border-l-8 border-red-600 shadow-lg hidden">
-                <h3 class="text-red-600 font-black text-[10px] uppercase mb-3">🛑 Interacciones</h3>
-                <div id="resInt" class="text-xs space-y-3 font-medium"></div>
+                <h3 class="text-red-600 font-black text-[10px] uppercase mb-2">🛑 Interacciones</h3>
+                <div id="resInt" class="text-[10px] space-y-3"></div>
             </div>
             <div id="boxBeers" class="bg-white rounded-3xl p-5 border-l-8 border-blue-600 shadow-lg hidden">
-                <h3 class="text-blue-600 font-black text-[10px] uppercase mb-3">📘 Criterios de Beers 2023</h3>
-                <div id="resBeers" class="text-xs space-y-3 font-medium"></div>
+                <h3 class="text-blue-600 font-black text-[10px] uppercase mb-2">📘 Beers 2023</h3>
+                <div id="resBeers" class="text-[10px] space-y-3"></div>
             </div>
         </div>
     </main>
 
     <footer class="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md flex gap-3 border-t border-slate-200 z-40">
         <button onclick="ejecutarAnalisis()" class="flex-1 bg-indigo-950 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl italic">Analizar</button>
-        <button id="btnPdf" onclick="descargarReporte()" class="hidden bg-red-600 text-white w-28 rounded-2xl flex items-center justify-center font-black uppercase text-[10px] shadow-lg">Reporte PDF</button>
+        <button id="btnPdf" onclick="descargarReporte()" class="hidden bg-red-600 text-white w-28 rounded-2xl flex items-center justify-center font-black uppercase text-[10px] shadow-lg italic">Reporte PDF</button>
     </footer>
 
     <script>
         let DB_MEDS = []; let DB_RULES = []; let seleccionados = [];
-        let final_dup = []; let final_int = []; let final_beers = []; let flagTriple = false;
+        let final_dup = []; let final_int = []; let final_beers = [];
 
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').then(reg => reg.update()); }
+        // Registro SW con cambio de versión para Modo Offline
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js?v=56.85').then(reg => {
+                reg.update();
+                console.log("SW v85 Sincronizado");
+            });
+        }
 
         window.onload = () => {
-            const m = localStorage.getItem('pwa_meds'); const r = localStorage.getItem('pwa_rules');
-            if(m && r) { DB_MEDS = JSON.parse(m); DB_RULES = JSON.parse(r); actualizarEstadoUI(); }
+            const m = localStorage.getItem('pwa_meds');
+            const r = localStorage.getItem('pwa_rules');
+            if(m && r) { 
+                DB_MEDS = JSON.parse(m); DB_RULES = JSON.parse(r); 
+                actualizarEstadoUI();
+            }
         };
 
         function actualizarEstadoUI() {
@@ -124,7 +136,7 @@
                 DB_MEDS = [];
                 lM.forEach(l => {
                     const c = l.split(sepM).map(v => v.replace(/"/g, '').trim());
-                    if(c.length >= 2 && c[0]) DB_MEDS.push({ name: c[0].toUpperCase(), norm: c[0].toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), atc: c[1].toUpperCase() });
+                    if(c.length >= 2 && c[0]) DB_MEDS.push({ name: c[0].toUpperCase(), atc: c[1].toUpperCase() });
                 });
                 const tI = await fI.text();
                 const lI = tI.split(/\r?\n/).filter(l => l.trim() !== "");
@@ -136,7 +148,7 @@
                 });
                 localStorage.setItem('pwa_meds', JSON.stringify(DB_MEDS));
                 localStorage.setItem('pwa_rules', JSON.stringify(DB_RULES));
-                actualizarEstadoUI(); alert("Sincronización Exitosa.");
+                actualizarEstadoUI(); alert("Bases guardadas correctamente.");
             } catch(e) { alert("Error: " + e.message); }
         }
 
@@ -144,7 +156,7 @@
             const cont = document.getElementById('sugCont');
             if(val.length < 2) { cont.classList.add('hidden'); return; }
             const q = val.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const matches = DB_MEDS.filter(m => m.norm.includes(q)).slice(0, 10);
+            const matches = DB_MEDS.filter(m => m.name.includes(q)).slice(0, 10);
             if(matches.length > 0) {
                 cont.innerHTML = matches.map(m => `<div class="sug-item" onclick="selectMed('${m.name}', '${m.atc}')">${m.name} <span class="text-emerald-500 text-[8px]">[${m.atc}]</span></div>`).join('');
                 cont.classList.remove('hidden');
@@ -153,26 +165,25 @@
 
         function selectMed(name, atc) {
             if(seleccionados.some(s => s.name === name)) return;
-            seleccionados.push({ name, atc: (atc || "S/N") });
+            seleccionados.push({ name, atc });
             document.getElementById('farmaInput').value = "";
             document.getElementById('sugCont').classList.add('hidden');
             renderLista();
         }
 
         function renderLista() {
-            document.getElementById('medCount').innerText = seleccionados.length;
             const cont = document.getElementById('listaSeleccionados');
             cont.innerHTML = seleccionados.map((m, i) => `
                 <div class="med-row">
-                    <div class="med-info"><span class="med-name font-black uppercase text-indigo-900">${m.name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${m.atc}</span></div>
+                    <div class="med-info"><span class="font-black uppercase text-indigo-900">${m.name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${m.atc}</span></div>
                     <button onclick="seleccionados.splice(${i},1); renderLista();" class="text-red-500 font-bold p-2">✕</button>
                 </div>`).join('');
         }
 
         function limpiarManual() {
-            if(confirm("¿Limpiar todo?")) {
+            if(confirm("¿Limpiar datos?")) {
                 seleccionados = []; renderLista();
-                document.getElementById('pNombre').value = ""; document.getElementById('pEdad').value = ""; document.getElementById('pPeso').value = "";
+                document.getElementById('pNombre').value = ""; document.getElementById('pEdad').value = "";
                 document.getElementById('resultados').classList.add('hidden'); document.getElementById('btnPdf').classList.add('hidden');
             }
         }
@@ -188,76 +199,53 @@
             const rD = document.getElementById('resDup'); rD.innerHTML = "";
             const rI = document.getElementById('resInt'); rI.innerHTML = "";
             const rB = document.getElementById('resBeers'); rB.innerHTML = "";
-            const aT = document.getElementById('alertaTriple'); aT.classList.add('hidden');
             
             document.getElementById('boxDup').classList.add('hidden');
             document.getElementById('boxInt').classList.add('hidden');
             document.getElementById('boxBeers').classList.add('hidden');
 
-            final_dup = []; final_int = []; final_beers = []; flagTriple = false;
+            final_dup = []; final_int = []; final_beers = [];
             let hallazgos = {};
 
-            // 1. Triple Whammy
-            const medsAINE = seleccionados.filter(m => m.atc.startsWith("M01A"));
-            const medsACEI = seleccionados.filter(m => m.atc.startsWith("C09"));
-            const medsDIUR = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.startsWith("C09B") || m.atc.startsWith("C09D"));
-            if(medsAINE.length && medsACEI.length && medsDIUR.length) {
-                flagTriple = true;
-                aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 TRIPLE WHAMMY DETECTADO</div>`;
-                aT.classList.remove('hidden');
-            }
-
-            // 2. Duplicidad Híbrida
+            // 1. Duplicidad Inteligente (C03 es 3 chars, resto 4)
             let grps = {}; 
             seleccionados.forEach(m => { 
                 let p = m.atc.startsWith("C03") ? m.atc.substring(0,3) : m.atc.substring(0,4);
                 if(!grps[p]) grps[p]=[]; grps[p].push(m.name); 
             });
             for(let p in grps) if(grps[p].length > 1) { 
-                const uniqueNames = [...new Set(grps[p])];
-                if(uniqueNames.length > 1) {
-                    final_dup.push({ grp: p, meds: uniqueNames }); 
-                    rD.innerHTML += `<p>• GRUPO ${p}: ${uniqueNames.join(' + ')}</p>`;
+                const unique = [...new Set(grps[p])];
+                if(unique.length > 1) {
+                    final_dup.push({ grp: p, meds: unique }); 
+                    rD.innerHTML += `<p>• GRUPO ${p}: ${unique.join(' + ')}</p>`;
                     document.getElementById('boxDup').classList.remove('hidden');
                 }
             }
 
-            // --- MOTOR DE ANÁLISIS v56.84 (PRIORIDAD POR LONGITUD ATC) ---
-            for(let ru of DB_RULES) {
-                const msgU = (ru.msg || "").toUpperCase();
-                const isBeersRule = msgU.includes("BEERS");
+            // --- MOTOR v56.85: Búsqueda por Máxima Especificidad ---
+            // Ordenamos reglas de la más larga a la más corta
+            const sortedRules = [...DB_RULES].sort((a,b) => (b.a.length + b.b.length) - (a.a.length + a.b.length));
 
-                for(let m1 of seleccionados) {
+            for(let m1 of seleccionados) {
+                // Para cada fármaco, buscamos la mejor regla aplicable
+                for(let ru of sortedRules) {
                     if(m1.atc.startsWith(ru.a)) {
+                        const isBeers = ru.msg.toUpperCase().includes("BEERS");
                         
+                        // Si es regla individual (A=B)
                         if(ru.a === ru.b) {
-                            if(isBeersRule) {
-                                if(edad >= 65) {
-                                    // Llave única que incluye la longitud del código ATC de la regla
-                                    const k = `BEERS_${m1.name}_LEN_${ru.a.length}`;
-                                    if(!hallazgos[k] || getW(ru.act) >= getW(hallazgos[k].act)) {
-                                        // Solo guardamos si no hay una regla más larga ya registrada
-                                        hallazgos[k] = { ...ru, disp: m1.name, priority: ru.a.length };
-                                    }
-                                }
-                            } else {
-                                for(let m2 of seleccionados) {
-                                    if(m1.name !== m2.name && m2.atc.startsWith(ru.b)) {
-                                        const k = `INT_${m1.name}_${m2.name}_LEN_${ru.a.length}`;
-                                        if(!hallazgos[k] || getW(ru.act) >= getW(hallazgos[k].act)) {
-                                            hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}`, priority: ru.a.length };
-                                        }
-                                    }
-                                }
+                            if(isBeers && edad >= 65) {
+                                const k = `BEERS_${m1.name}`;
+                                if(!hallazgos[k]) hallazgos[k] = { ...ru, disp: m1.name };
                             }
-                        } else {
+                        } 
+                        // Si es regla combinada
+                        else {
                             for(let m2 of seleccionados) {
                                 if(m1.name !== m2.name && m2.atc.startsWith(ru.b)) {
-                                    const k = `INT_${m1.name}_${m2.name}_LEN_${ru.a.length + ru.b.length}`;
-                                    if(isBeersRule && edad < 65) continue;
-                                    if(!hallazgos[k] || getW(ru.act) >= getW(hallazgos[k].act)) {
-                                        hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}`, priority: ru.a.length + ru.b.length };
-                                    }
+                                    const k = isBeers ? `B_INT_${m1.name}_${m2.name}` : `INT_${m1.name}_${m2.name}`;
+                                    if(isBeers && edad < 65) continue;
+                                    if(!hallazgos[k]) hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}` };
                                 }
                             }
                         }
@@ -265,26 +253,15 @@
                 }
             }
 
-            // --- FILTRO DE REGLAS ESPECÍFICAS ---
-            // Si hay una regla para el mismo fármaco/interacción, elegimos la de mayor "priority" (ATC más largo)
-            let filtrados = {};
-            for(let key in hallazgos) {
-                const h = hallazgos[key];
-                const baseKey = h.disp + (key.includes("BEERS") ? "_B" : "_I");
-                if(!filtrados[baseKey] || h.priority > filtrados[baseKey].priority) {
-                    filtrados[baseKey] = h;
-                }
-            }
-
-            for(let id in filtrados) {
-                const h = filtrados[id];
+            for(let id in hallazgos) {
+                const h = hallazgos[id];
                 if((h.msg || "").toUpperCase().includes("BEERS")) {
                     final_beers.push({ meds: h.disp, desc: h.msg, act: h.act });
-                    rB.innerHTML += `<div class="mb-2 border-b pb-1 text-[10px] font-bold"><b>${h.disp}</b><br>${h.msg}<br><span class="text-blue-600 uppercase italic">ACCIÓN: ${h.act}</span></div>`;
+                    rB.innerHTML += `<div class="mb-2 border-b pb-1"><b>${h.disp}</b><br>${h.msg}<br><span class="text-blue-600 uppercase italic">Acción: ${h.act}</span></div>`;
                     document.getElementById('boxBeers').classList.remove('hidden');
                 } else {
                     final_int.push({ meds: h.disp, desc: h.msg, act: h.act });
-                    rI.innerHTML += `<div class="mb-2 border-b pb-1 text-[10px] font-bold"><b>${h.disp}</b><br>${h.msg}<br><span class="text-red-600 uppercase italic">ACCIÓN: ${h.act}</span></div>`;
+                    rI.innerHTML += `<div class="mb-2 border-b pb-1"><b>${h.disp}</b><br>${h.msg}<br><span class="text-red-600 uppercase italic">Acción: ${h.act}</span></div>`;
                     document.getElementById('boxInt').classList.remove('hidden');
                 }
             }
@@ -308,10 +285,20 @@
                 doc.autoTable({ startY: 50, head: [['NOMBRE GENÉRICO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 8 } });
                 let curY = doc.lastAutoTable.finalY + 10;
 
-                if(flagTriple) { doc.setTextColor(185, 28, 28); doc.text("🚨 ALERTA: TRIPLE WHAMMY DETECTADO", 15, curY); curY += 12; }
-                if(final_dup.length) { doc.setFontSize(11); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAPÉUTICA", 15, curY); doc.autoTable({ startY: curY+5, head: [['GRUPO', 'MEDICAMENTOS']], body: final_dup.map(d => [d.grp, d.meds.join(' + ')]), headStyles: {fillColor: [217, 119, 6]}, styles: {fontSize: 8} }); curY = doc.lastAutoTable.finalY + 10; }
-                if(final_int.length) { doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES MEDICAMENTOSAS", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_int.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
-                if(final_beers.length) { doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS 2023", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); }
+                if(final_dup.length) { 
+                    doc.setFontSize(11); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAPÉUTICA", 15, curY); 
+                    doc.autoTable({ startY: curY+5, head: [['GRUPO', 'MEDS']], body: final_dup.map(d => [d.grp, d.meds.join(' + ')]), headStyles: {fillColor: [217, 119, 6]}, styles: {fontSize: 8} }); 
+                    curY = doc.lastAutoTable.finalY + 10; 
+                }
+                if(final_int.length) { 
+                    doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES", 15, curY); 
+                    doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_int.map(h => [h.meds, h.desc, h.act.trim()]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); 
+                    curY = doc.lastAutoTable.finalY + 10; 
+                }
+                if(final_beers.length) { 
+                    doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS 2023", 15, curY); 
+                    doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act.trim()]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); 
+                }
                 
                 const totalPages = doc.internal.getNumberOfPages();
                 for (let i = 1; i <= totalPages; i++) {
@@ -322,9 +309,7 @@
                     const footerText = "Esta aplicación es una herramienta de apoyo a la decisión clínica. Toda información proporcionada es responsabilidad exclusiva del médico tratante. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio profesional. La información no sustituye la consulta médica ni el criterio del especialista.";
                     doc.text(footerText, 15, pH - 10, { maxWidth: 170 });
                 }
-
                 doc.save(`Vigilancia_${pac}.pdf`);
-                alert("¡REPORTE GENERADO CON ÉXITO!");
             } catch(e) { alert("Error PDF: " + e.message); }
         }
     </script>
