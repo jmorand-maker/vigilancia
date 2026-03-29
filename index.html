@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v56.81</title>
+    <title>Vigilancia Móvil v56.82</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,23 +23,23 @@
     <div id="welcomeScreen" class="fixed inset-0 bg-indigo-950 flex items-center justify-center p-4 z-[9999]">
         <div class="bg-white w-full max-w-lg max-h-[85vh] rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
             <div class="bg-indigo-900 p-6 text-white text-center border-b-4 border-emerald-500">
-                <h1 class="text-2xl font-black uppercase italic italic">Vigilancia Móvil</h1>
-                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1">v56.81 • EDICIÓN PRODUCCIÓN</p>
+                <h1 class="text-2xl font-black uppercase italic">Vigilancia Móvil</h1>
+                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 italic">v56.82 • EDICIÓN SEGURIDAD</p>
             </div>
             <div class="p-8 overflow-y-auto space-y-6">
                 <div class="p-6 bg-red-50 rounded-3xl border-2 border-red-100 shadow-inner text-justify">
                     <h3 class="text-xs font-black text-red-700 uppercase mb-3 text-center">🛑 AVISO LEGAL</h3>
                     <p class="text-[11px] text-red-900 leading-relaxed italic">
-                        Esta aplicación es una herramienta de apoyo a la decisión clínica y no sustituye el juicio profesional. Toda información proporcionada es responsabilidad exclusiva del médico tratante. El desarrollador no se hace responsable de decisiones médicas tomadas basadas en esta herramienta.
+                        Esta aplicación es una herramienta de apoyo a la decisión clínica. Toda información proporcionada es responsabilidad exclusiva del médico tratante. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio profesional. La información no sustituye la consulta médica ni el criterio del especialista.
                     </p>
                 </div>
-                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl hover:bg-black transition-all">ACEPTAR Y ENTRAR</button>
+                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ACEPTAR Y ENTRAR</button>
             </div>
         </div>
     </div>
 
     <header class="bg-indigo-950 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.81</h1>
+        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.82</h1>
         <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
     </header>
 
@@ -68,7 +68,7 @@
                 <button onclick="limpiarManual()" class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase shadow-md">Limpiar</button>
             </div>
             <div class="relative">
-                <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Escriba fármaco..." autocomplete="off">
+                <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Buscar medicamento..." autocomplete="off">
                 <div id="sugCont" class="hidden"></div>
             </div>
             <div id="listaSeleccionados" class="mt-4"></div>
@@ -93,7 +93,7 @@
 
     <footer class="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md flex gap-3 border-t border-slate-200 z-40">
         <button onclick="ejecutarAnalisis()" class="flex-1 bg-indigo-950 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl italic">Analizar</button>
-        <button id="btnPdf" onclick="descargarReporte()" class="hidden bg-red-600 text-white w-28 rounded-2xl flex items-center justify-center font-black uppercase text-[10px] shadow-lg italic">Reporte PDF</button>
+        <button id="btnPdf" onclick="descargarReporte()" class="hidden bg-red-600 text-white w-28 rounded-2xl flex items-center justify-center font-black uppercase text-[10px] shadow-lg">Reporte PDF</button>
     </footer>
 
     <script>
@@ -222,23 +222,19 @@
                 }
             }
 
-            // --- MOTOR DE ANÁLISIS MEJORADO v56.81 (SIN FANTASMAS) ---
+            // --- MOTOR DE ANÁLISIS v56.82 (SEGURIDAD ETARIA GLOBAL) ---
             for(let ru of DB_RULES) {
+                const msgU = (ru.msg || "").toUpperCase();
                 for(let m1 of seleccionados) {
                     if(m1.atc.startsWith(ru.a)) {
-                        const msgU = (ru.msg || "").toUpperCase();
-                        
-                        // Caso A: Regla de un solo fármaco (Beers)
-                        if(ru.a === ru.b && msgU.includes("BEERS")) {
-                            if(edad >= 65) {
-                                const k = `BEERS_${m1.name}_${ru.msg.substring(0,10)}`;
-                                if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = { ...ru, disp: m1.name };
-                            }
+                        // Caso A: Un solo fármaco
+                        if(ru.a === ru.b) {
+                            const k = `BEERS_${m1.name}_${ru.msg.substring(0,10)}`;
+                            if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = { ...ru, disp: m1.name };
                         } 
-                        // Caso B: Regla de dos fármacos (Interacciones o Doble Fármaco)
+                        // Caso B: Dos fármacos
                         else {
                             for(let m2 of seleccionados) {
-                                // Vital: m1 y m2 deben ser diferentes físicamente para activar la regla
                                 if(m1.name !== m2.name && m2.atc.startsWith(ru.b)) {
                                     const k = `INT_${m1.name}_${m2.name}`;
                                     if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}` };
@@ -249,12 +245,17 @@
                 }
             }
 
+            // --- FILTRO DE SALIDA: Beers solo para >= 65 ---
             for(let id in hallazgos) {
                 const h = hallazgos[id];
-                if((h.msg || "").toUpperCase().includes("BEERS")) {
-                    final_beers.push({ meds: h.disp, desc: h.msg, act: h.act });
-                    rB.innerHTML += `<div class="mb-2 border-b pb-1 text-[10px] font-bold"><b>${h.disp}</b><br>${h.msg}<br><span class="text-blue-600 uppercase italic">ACCIÓN: ${h.act}</span></div>`;
-                    document.getElementById('boxBeers').classList.remove('hidden');
+                const isBeers = (h.msg || "").toUpperCase().includes("BEERS");
+                
+                if(isBeers) {
+                    if(edad >= 65) {
+                        final_beers.push({ meds: h.disp, desc: h.msg, act: h.act });
+                        rB.innerHTML += `<div class="mb-2 border-b pb-1 text-[10px] font-bold"><b>${h.disp}</b><br>${h.msg}<br><span class="text-blue-600 uppercase italic">ACCIÓN: ${h.act}</span></div>`;
+                        document.getElementById('boxBeers').classList.remove('hidden');
+                    }
                 } else {
                     final_int.push({ meds: h.disp, desc: h.msg, act: h.act });
                     rI.innerHTML += `<div class="mb-2 border-b pb-1 text-[10px] font-bold"><b>${h.disp}</b><br>${h.msg}<br><span class="text-red-600 uppercase italic">ACCIÓN: ${h.act}</span></div>`;
@@ -286,14 +287,15 @@
                 if(final_int.length) { doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES MEDICAMENTOSAS", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_int.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
                 if(final_beers.length) { doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS 2023", 15, curY); doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); }
                 
-                // --- PIE DE PÁGINA Y PAGINACIÓN ---
+                // PIE DE PÁGINA PROFESIONAL
                 const totalPages = doc.internal.getNumberOfPages();
                 for (let i = 1; i <= totalPages; i++) {
                     doc.setPage(i);
                     doc.setFontSize(8); doc.setTextColor(150);
                     doc.text(`Página ${i} de ${totalPages}`, pW - 30, pH - 10);
                     doc.setFontSize(7); doc.setTextColor(71, 85, 105);
-                    doc.text("Esta aplicación es una herramienta de apoyo clínico y no sustituye el juicio profesional. Toda información es responsabilidad exclusiva del médico tratante.", 15, pH - 10, { maxWidth: 160 });
+                    const footerText = "Esta aplicación es una herramienta de apoyo a la decisión clínica. Toda información proporcionada es responsabilidad exclusiva del médico tratante. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio profesional. La información no sustituye la consulta médica ni el criterio del especialista.";
+                    doc.text(footerText, 15, pH - 10, { maxWidth: 165 });
                 }
 
                 doc.save(`Vigilancia_${pac}.pdf`);
