@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v56.83</title>
+    <title>Vigilancia Móvil v56.84</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,7 +24,7 @@
         <div class="bg-white w-full max-w-lg max-h-[85vh] rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
             <div class="bg-indigo-900 p-6 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-2xl font-black uppercase italic">Vigilancia Móvil</h1>
-                <p class="text-[10px] text-emerald-400 font-bold uppercase mt-1">v56.83 • PRECISIÓN CLÍNICA</p>
+                <p class="text-[10px] text-emerald-400 font-bold uppercase mt-1">v56.84 • PRECISIÓN ATC</p>
             </div>
             <div class="p-8 overflow-y-auto space-y-6">
                 <div class="p-6 bg-red-50 rounded-3xl border-2 border-red-100 shadow-inner text-justify">
@@ -33,13 +33,13 @@
                         Esta aplicación es una herramienta de apoyo a la decisión clínica. Toda información proporcionada es responsabilidad exclusiva del médico tratante. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio profesional. La información no sustituye la consulta médica ni el criterio del especialista.
                     </p>
                 </div>
-                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl hover:bg-black transition-all">ACEPTAR Y ENTRAR</button>
+                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ACEPTAR Y ENTRAR</button>
             </div>
         </div>
     </div>
 
     <header class="bg-indigo-950 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.83</h1>
+        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.84</h1>
         <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
     </header>
 
@@ -64,11 +64,11 @@
 
         <section class="space-y-4 relative">
             <div class="flex justify-between items-center px-1">
-                <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripción Actual <span id="medCount" class="badge-count">0</span></h2>
+                <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripción <span id="medCount" class="badge-count">0</span></h2>
                 <button onclick="limpiarManual()" class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase shadow-md">Limpiar</button>
             </div>
             <div class="relative">
-                <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Escriba fármaco..." autocomplete="off">
+                <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Buscar fármaco..." autocomplete="off">
                 <div id="sugCont" class="hidden"></div>
             </div>
             <div id="listaSeleccionados" class="mt-4"></div>
@@ -207,7 +207,7 @@
                 aT.classList.remove('hidden');
             }
 
-            // 2. Duplicidad
+            // 2. Duplicidad Híbrida
             let grps = {}; 
             seleccionados.forEach(m => { 
                 let p = m.atc.startsWith("C03") ? m.atc.substring(0,3) : m.atc.substring(0,4);
@@ -222,7 +222,7 @@
                 }
             }
 
-            // --- MOTOR DE ANÁLISIS v56.83 (REFINAMIENTO QUIRÚRGICO) ---
+            // --- MOTOR DE ANÁLISIS v56.84 (PRIORIDAD POR LONGITUD ATC) ---
             for(let ru of DB_RULES) {
                 const msgU = (ru.msg || "").toUpperCase();
                 const isBeersRule = msgU.includes("BEERS");
@@ -230,33 +230,34 @@
                 for(let m1 of seleccionados) {
                     if(m1.atc.startsWith(ru.a)) {
                         
-                        // Caso A: Regla de un solo código ATC (Ej: C01A;C01A o N06A;N06A)
                         if(ru.a === ru.b) {
                             if(isBeersRule) {
-                                // Es un Criterio de Beers para un solo fármaco (Ej: Digoxina)
                                 if(edad >= 65) {
-                                    const k = `BEERS_SINGLE_${m1.name}_${ru.msg.substring(0,10)}`;
-                                    if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = { ...ru, disp: m1.name };
+                                    // Llave única que incluye la longitud del código ATC de la regla
+                                    const k = `BEERS_${m1.name}_LEN_${ru.a.length}`;
+                                    if(!hallazgos[k] || getW(ru.act) >= getW(hallazgos[k].act)) {
+                                        // Solo guardamos si no hay una regla más larga ya registrada
+                                        hallazgos[k] = { ...ru, disp: m1.name, priority: ru.a.length };
+                                    }
                                 }
                             } else {
-                                // Es una interacción de "Doble Fármaco" de la misma familia (Ej: N06A;N06A)
-                                // OBLIGATORIO: Validar que existan al menos 2 fármacos diferentes de esa familia
                                 for(let m2 of seleccionados) {
                                     if(m1.name !== m2.name && m2.atc.startsWith(ru.b)) {
-                                        const k = `INT_FAMILY_${m1.name}_${m2.name}`;
-                                        if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}` };
+                                        const k = `INT_${m1.name}_${m2.name}_LEN_${ru.a.length}`;
+                                        if(!hallazgos[k] || getW(ru.act) >= getW(hallazgos[k].act)) {
+                                            hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}`, priority: ru.a.length };
+                                        }
                                     }
                                 }
                             }
-                        } 
-                        // Caso B: Interacción entre códigos ATC distintos (Ej: B01A;M01A)
-                        else {
+                        } else {
                             for(let m2 of seleccionados) {
                                 if(m1.name !== m2.name && m2.atc.startsWith(ru.b)) {
-                                    const k = `INT_DIFF_${m1.name}_${m2.name}`;
-                                    // Si el mensaje contiene "BEERS", aplicar filtro de edad
+                                    const k = `INT_${m1.name}_${m2.name}_LEN_${ru.a.length + ru.b.length}`;
                                     if(isBeersRule && edad < 65) continue;
-                                    if(!hallazgos[k] || getW(ru.act) > getW(hallazgos[k].act)) hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}` };
+                                    if(!hallazgos[k] || getW(ru.act) >= getW(hallazgos[k].act)) {
+                                        hallazgos[k] = { ...ru, disp: `${m1.name} + ${m2.name}`, priority: ru.a.length + ru.b.length };
+                                    }
                                 }
                             }
                         }
@@ -264,8 +265,19 @@
                 }
             }
 
-            for(let id in hallazgos) {
-                const h = hallazgos[id];
+            // --- FILTRO DE REGLAS ESPECÍFICAS ---
+            // Si hay una regla para el mismo fármaco/interacción, elegimos la de mayor "priority" (ATC más largo)
+            let filtrados = {};
+            for(let key in hallazgos) {
+                const h = hallazgos[key];
+                const baseKey = h.disp + (key.includes("BEERS") ? "_B" : "_I");
+                if(!filtrados[baseKey] || h.priority > filtrados[baseKey].priority) {
+                    filtrados[baseKey] = h;
+                }
+            }
+
+            for(let id in filtrados) {
+                const h = filtrados[id];
                 if((h.msg || "").toUpperCase().includes("BEERS")) {
                     final_beers.push({ meds: h.disp, desc: h.msg, act: h.act });
                     rB.innerHTML += `<div class="mb-2 border-b pb-1 text-[10px] font-bold"><b>${h.disp}</b><br>${h.msg}<br><span class="text-blue-600 uppercase italic">ACCIÓN: ${h.act}</span></div>`;
