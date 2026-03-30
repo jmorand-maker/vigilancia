@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v56.86</title>
+    <title>Vigilancia Móvil v56.87</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,22 +24,22 @@
         <div class="bg-white w-full max-w-lg max-h-[85vh] rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
             <div class="bg-indigo-900 p-6 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-2xl font-black uppercase italic">Vigilancia Móvil</h1>
-                <p class="text-[10px] text-emerald-400 font-bold uppercase mt-1">v56.86 • EDICIÓN FARMACÉUTICA</p>
+                <p class="text-[10px] text-emerald-400 font-bold uppercase mt-1 italic">v56.87 • EDICIÓN BLINDADA</p>
             </div>
             <div class="p-8 overflow-y-auto space-y-6">
-                <div class="p-6 bg-red-50 rounded-3xl border-2 border-red-100 text-justify italic">
-                    <p class="text-[11px] text-red-900 leading-relaxed">
+                <div class="p-6 bg-red-50 rounded-3xl border-2 border-red-100 text-justify">
+                    <p class="text-[11px] text-red-900 leading-relaxed italic">
                         Esta aplicación es una herramienta de apoyo a la decisión clínica. Toda información proporcionada es responsabilidad exclusiva del médico tratante. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio profesional. La información no sustituye la consulta médica ni el criterio del especialista.
                     </p>
                 </div>
-                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl">ACEPTAR</button>
+                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-white py-5 rounded-2xl font-black text-sm uppercase shadow-xl hover:bg-black transition-all">ACEPTAR</button>
             </div>
         </div>
     </div>
 
     <header class="bg-indigo-950 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.86</h1>
-        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
+        <h1 class="font-black uppercase italic tracking-tighter text-xs">Vigilancia v56.87</h1>
+        <div id="status" class="sync-status bg-slate-800 text-slate-400">Offline</div>
     </header>
 
     <main class="p-4 space-y-6">
@@ -49,7 +49,7 @@
                 <div class="flex flex-col"><label class="text-[9px] font-black uppercase text-slate-500 mb-1">Meds CSV</label><input type="file" id="csvMeds" accept=".csv" class="text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-200"></div>
                 <div class="flex flex-col"><label class="text-[9px] font-black uppercase text-slate-500 mb-1">Reglas CSV</label><input type="file" id="csvInts" accept=".csv" class="text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-200"></div>
             </div>
-            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-3 rounded-xl font-black text-[10px] uppercase italic">Sincronizar Datos</button>
+            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-3 rounded-xl font-black text-[10px] uppercase italic">Sincronizar y Guardar</button>
         </section>
 
         <section class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
@@ -66,7 +66,7 @@
                 <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">3. Prescripción <span id="medCount" class="badge-count">0</span></h2>
                 <button onclick="limpiarManual()" class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase shadow-md">Limpiar</button>
             </div>
-            <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Escriba fármaco..." autocomplete="off">
+            <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full bg-white border-2 border-indigo-100 p-4 rounded-2xl font-black shadow-sm outline-none" placeholder="Buscar fármaco..." autocomplete="off">
             <div id="sugCont" class="hidden"></div>
             <div id="listaSeleccionados" class="mt-4"></div>
         </section>
@@ -78,11 +78,11 @@
             </div>
             <div id="boxInt" class="bg-white rounded-3xl p-5 border-l-8 border-red-600 shadow-lg hidden">
                 <h3 class="text-red-600 font-black text-[10px] uppercase mb-2">🛑 Interacciones</h3>
-                <div id="resInt" class="text-[10px] space-y-3"></div>
+                <div id="resInt" class="text-[10px] space-y-3 font-medium"></div>
             </div>
             <div id="boxBeers" class="bg-white rounded-3xl p-5 border-l-8 border-blue-600 shadow-lg hidden">
-                <h3 class="text-blue-600 font-black text-[10px] uppercase mb-2">📘 Beers 2023</h3>
-                <div id="resBeers" class="text-[10px] space-y-3"></div>
+                <h3 class="text-blue-600 font-black text-[10px] uppercase mb-2">📘 Criterios Geriátricos (PIM)</h3>
+                <div id="resBeers" class="text-[10px] space-y-3 font-medium"></div>
             </div>
         </div>
     </main>
@@ -96,19 +96,25 @@
         let DB_MEDS = []; let DB_RULES = []; let seleccionados = [];
         let final_dup = []; let final_int = []; let final_beers = [];
 
+        // Registro SW v87
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js?v=56.86').then(reg => reg.update());
+            navigator.serviceWorker.register('./sw.js?v=56.87').then(reg => reg.update());
         }
 
         window.onload = () => {
-            const m = localStorage.getItem('pwa_meds'); const r = localStorage.getItem('pwa_rules');
-            if(m && r) { DB_MEDS = JSON.parse(m); DB_RULES = JSON.parse(r); actualizarEstadoUI(); }
+            const m = localStorage.getItem('pwa_meds');
+            const r = localStorage.getItem('pwa_rules');
+            if(m && r) { 
+                DB_MEDS = JSON.parse(m); DB_RULES = JSON.parse(r); 
+                actualizarEstadoUI();
+            }
         };
 
         function actualizarEstadoUI() {
             const s = document.getElementById('status');
             s.innerText = `${DB_RULES.length} Reglas Listas`;
             s.className = "sync-status bg-emerald-500 text-white";
+            document.getElementById('medCount').innerText = seleccionados.length;
         }
 
         async function procesarArchivos() {
@@ -130,11 +136,14 @@
                 DB_RULES = [];
                 lI.forEach(l => {
                     const c = l.split(sepI).map(v => v.replace(/"/g, '').trim());
-                    if(c.length >= 4 && c[0] && !c[0].includes("ATC")) DB_RULES.push({ a: c[0].toUpperCase(), b: c[1].toUpperCase(), msg: c[2], act: c[3] });
+                    // CARGA ROBUSTA: Captura todas las líneas ignorando cabeceras
+                    if(c.length >= 4 && c[0] && !c[0].toUpperCase().includes("ATC")) {
+                        DB_RULES.push({ a: c[0].toUpperCase(), b: c[1].toUpperCase(), msg: c[2], act: c[3] });
+                    }
                 });
                 localStorage.setItem('pwa_meds', JSON.stringify(DB_MEDS));
                 localStorage.setItem('pwa_rules', JSON.stringify(DB_RULES));
-                actualizarEstadoUI(); alert("Datos Sincronizados.");
+                actualizarEstadoUI(); alert("Sincronización Exitosa.");
             } catch(e) { alert("Error: " + e.message); }
         }
 
@@ -154,23 +163,22 @@
             seleccionados.push({ name, atc });
             document.getElementById('farmaInput').value = "";
             document.getElementById('sugCont').classList.add('hidden');
+            actualizarEstadoUI();
             renderLista();
         }
 
         function renderLista() {
-            // ACTUALIZACIÓN DEL CONTADOR
-            document.getElementById('medCount').innerText = seleccionados.length;
             const cont = document.getElementById('listaSeleccionados');
             cont.innerHTML = seleccionados.map((m, i) => `
                 <div class="med-row">
                     <div class="med-info"><span class="font-black uppercase text-indigo-900">${m.name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${m.atc}</span></div>
-                    <button onclick="seleccionados.splice(${i},1); renderLista();" class="text-red-500 font-bold p-2">✕</button>
+                    <button onclick="seleccionados.splice(${i},1); renderLista(); actualizarEstadoUI();" class="text-red-500 font-bold p-2">✕</button>
                 </div>`).join('');
         }
 
         function limpiarManual() {
-            if(confirm("¿Limpiar todo?")) {
-                seleccionados = []; renderLista();
+            if(confirm("¿Limpiar datos?")) {
+                seleccionados = []; renderLista(); actualizarEstadoUI();
                 document.getElementById('pNombre').value = ""; document.getElementById('pEdad').value = "";
                 document.getElementById('resultados').classList.add('hidden'); document.getElementById('btnPdf').classList.add('hidden');
             }
@@ -210,40 +218,45 @@
                 }
             }
 
-            // --- MOTOR v56.86: BÚSQUEDA DE MÁXIMA ESPECIFICIDAD ---
-            for(let m1 of seleccionados) {
-                let mejoresReglas = [];
+            // --- MOTOR v56.87: UNIFICACIÓN DE VÍAS Y MÁXIMA ESPECIFICIDAD ---
+            const sortedRules = [...DB_RULES].sort((a,b) => (b.a.length + b.b.length) - (a.a.length + a.b.length));
 
-                for(let ru of DB_RULES) {
+            for(let m1 of seleccionados) {
+                for(let ru of sortedRules) {
                     if(m1.atc.startsWith(ru.a)) {
-                        const isBeers = ru.msg.toUpperCase().includes("BEERS");
-                        
-                        // Si es regla individual (Beers)
-                        if(ru.a === ru.b && isBeers && edad >= 65) {
-                            mejoresReglas.push({ ...ru, disp: m1.name, priority: ru.a.length, type: 'BEERS' });
-                        } 
-                        // Si es regla combinada
-                        else if(ru.a !== ru.b) {
+                        const msgU = (ru.msg || "").toUpperCase();
+                        // Nueva detección legal de PIM (ex-Beers)
+                        const isPim = msgU.includes("PIM") || msgU.includes("GERIATRICO") || msgU.includes("CRITERIO");
+
+                        if(ru.a === ru.b) {
+                            if(isPim && edad >= 65) {
+                                const k = `PIM_${m1.name}`;
+                                if(!hallazgos[k]) hallazgos[k] = { ...ru, disp: m1.name, priority: ru.a.length };
+                            }
+                        } else {
                             for(let m2 of seleccionados) {
                                 if(m1.name !== m2.name && m2.atc.startsWith(ru.b)) {
-                                    mejoresReglas.push({ ...ru, disp: `${m1.name} + ${m2.name}`, priority: ru.a.length + ru.b.length, type: 'INT' });
+                                    // LLAVE CANÓNICA: Ordenamos nombres alfabéticamente para evitar A+B y B+A
+                                    const pair = [m1.name, m2.name].sort();
+                                    const k = isPim ? `PIM_INT_${pair[0]}_${pair[1]}` : `INT_${pair[0]}_${pair[1]}`;
+                                    
+                                    if(isPim && edad < 65) continue;
+                                    
+                                    // Solo guardamos si es más específico que lo ya encontrado
+                                    if(!hallazgos[k] || (ru.a.length + ru.b.length) > hallazgos[k].priority) {
+                                        hallazgos[k] = { ...ru, disp: `${pair[0]} + ${pair[1]}`, priority: (ru.a.length + ru.b.length) };
+                                    }
                                 }
                             }
                         }
                     }
                 }
-
-                // Filtrar para quedarnos solo con la regla más específica para este fármaco/pareja
-                mejoresReglas.sort((a,b) => b.priority - a.priority);
-                mejoresReglas.forEach(h => {
-                    const k = `${h.type}_${h.disp}`;
-                    if(!hallazgos[k] || h.priority > hallazgos[k].priority) hallazgos[k] = h;
-                });
             }
 
             for(let id in hallazgos) {
                 const h = hallazgos[id];
-                if(h.type === 'BEERS') {
+                const msgU = (h.msg || "").toUpperCase();
+                if(msgU.includes("PIM") || msgU.includes("GERIATRICO") || msgU.includes("CRITERIO")) {
                     final_beers.push({ meds: h.disp, desc: h.msg, act: h.act });
                     rB.innerHTML += `<div class="mb-2 border-b pb-1"><b>${h.disp}</b><br>${h.msg}<br><span class="text-blue-600 uppercase italic">Acción: ${h.act}</span></div>`;
                     document.getElementById('boxBeers').classList.remove('hidden');
@@ -280,12 +293,11 @@
                 }
                 if(final_int.length) { 
                     doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES", 15, curY); 
-                    // CORRECCIÓN DE LA COMA EXTRA
                     doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_int.map(h => [h.meds, h.desc, h.act.trim().replace(/,$/, "")]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); 
                     curY = doc.lastAutoTable.finalY + 10; 
                 }
                 if(final_beers.length) { 
-                    doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS DE BEERS 2023", 15, curY); 
+                    doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIO GERIÁTRICO (PIM)", 15, curY); 
                     doc.autoTable({ startY: curY+5, head: [['MEDS', 'RIESGO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act.trim().replace(/,$/, "")]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); 
                 }
                 
