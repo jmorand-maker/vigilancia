@@ -1,5 +1,5 @@
 // SW v3: Limpieza Profunda y Refuerzo Offline para iOS y S25
-const CACHE_NAME = 'vigilancia-ultra-safe-v3 v56.99'; 
+const CACHE_NAME = 'vigilancia-ultra-safe-v3 v60.00'; 
 
 const ASSETS = [
   './',
