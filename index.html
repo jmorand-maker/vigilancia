@@ -3,56 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v60.07</title>
+    <title>Vigilancia Móvil v65.00</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <style>
-        body { -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         #sugCont { max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); position: absolute; width: 100%; z-index: 100; background: white; border: 1px solid #e2e8f0; }
         .sug-item { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 13px; font-weight: 600; color: #1e293b; display: block; line-height: 1.2; }
-        .med-row { background: white; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; }
-        .badge-count { background: #4338ca; color: white; padding: 2px 12px; border-radius: 999px; font-size: 12px; font-weight: 900; margin-left: 8px; }
+        .med-row { background: white; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #cbd5e1; }
+        .badge-count { background: #1e293b; color: #10b981; padding: 2px 12px; border-radius: 999px; font-size: 12px; font-weight: 900; margin-left: 8px; }
+        #farmaInput { border: 3px solid #10b981; background-color: #f8fafc; font-weight: 800; }
         .sync-status { font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
-        #farmaInput { border: 3px solid #10b981; background-color: #f0f9ff; }
     </style>
 </head>
 <body class="min-h-screen pb-32">
 
-    <div id="welcomeScreen" class="fixed inset-0 bg-indigo-950 flex items-center justify-center p-4 z-[9999]">
-        <div class="bg-white w-full max-w-lg max-h-[85vh] rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
-            <div class="bg-indigo-900 p-6 text-white text-center border-b-4 border-emerald-500">
-                <h1 class="text-2xl font-black uppercase italic text-emerald-400">Vigilancia Móvil</h1>
-                <p class="text-[10px] text-white font-bold uppercase mt-1 italic">v60.07 • COBERTURA TOTAL</p>
+    <div id="welcomeScreen" class="fixed inset-0 bg-slate-900 flex items-center justify-center p-4 z-[9999]">
+        <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
+            <div class="bg-slate-800 p-6 text-white text-center border-b-4 border-emerald-500">
+                <h1 class="text-2xl font-black italic text-emerald-400">VIGILANCIA MÓVIL</h1>
+                <p class="text-[10px] uppercase font-bold mt-1">v65.00 • BLINDAJE DE IDENTIDAD</p>
             </div>
-            <div class="p-8 overflow-y-auto space-y-4 text-justify italic text-[11px] text-slate-800">
-                <p class="font-black text-red-600 uppercase text-center border-b pb-2">AVISO DE RESPONSABILIDAD</p>
-                <p>Apoyo a la decisión clínica. La responsabilidad final es exclusivamente del profesional tratante.</p>
-                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-indigo-900 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl mt-4">ACEPTAR</button>
+            <div class="p-8 space-y-4 text-justify text-[11.5px] text-slate-800 font-medium">
+                <p class="font-black text-red-600 text-center uppercase border-b pb-2">Aviso de Advertencia</p>
+                <p>“Esta aplicación es una herramienta de apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante. La información no sustituye la consulta médica ni el criterio del especialista.”</p>
+                <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-slate-800 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl hover:bg-black transition-all">ACEPTAR RESPONSABILIDAD</button>
             </div>
         </div>
     </div>
 
-    <header class="bg-indigo-950 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic text-xs text-emerald-400">Vigilancia v60.07</h1>
-        <div id="status" class="sync-status bg-slate-800 text-slate-400">Offline</div>
+    <header class="bg-slate-900 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
+        <h1 class="font-black uppercase italic text-xs text-emerald-400">Vigilancia v65.00</h1>
+        <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
     </header>
 
     <main class="p-4 space-y-6">
         <section class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
-            <h2 class="text-[10px] font-black text-indigo-900 uppercase italic mb-4">1. Sincronización</h2>
+            <h2 class="text-[10px] font-black text-slate-500 uppercase italic mb-4">1. Sincronización</h2>
             <div class="space-y-2 mb-4">
                 <div class="flex flex-col"><label class="text-[8px] font-black text-slate-400 uppercase">Medicamentos</label><input type="file" id="csvMeds" class="text-[10px]"></div>
-                <div class="flex flex-col"><label class="text-[8px] font-black text-slate-400 uppercase">Reglas</label><input type="file" id="csvInts" class="text-[10px]"></div>
+                <div class="flex flex-col"><label class="text-[8px] font-black text-slate-400 uppercase">Reglas de Interacción</label><input type="file" id="csvInts" class="text-[10px]"></div>
             </div>
-            <button onclick="procesarArchivos()" class="w-full bg-indigo-950 text-white py-3 rounded-xl font-black text-[10px] uppercase">Actualizar Bases</button>
+            <button onclick="procesarArchivos()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-black text-[10px] uppercase">Sincronizar Bases</button>
         </section>
 
         <section class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
             <div class="flex gap-2 mb-3">
-                <input type="text" id="pNombre" class="flex-1 bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="Paciente">
+                <input type="text" id="pNombre" class="flex-1 bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="Nombre Paciente">
                 <input type="number" id="pEdad" class="w-20 bg-slate-100 rounded-xl p-3 text-xs font-black" placeholder="Edad">
             </div>
             <input type="number" id="pPeso" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black" placeholder="Peso (kg)">
@@ -60,10 +60,10 @@
 
         <section class="space-y-4 relative">
             <div class="flex justify-between items-center px-1">
-                <h2 class="text-[10px] font-black text-indigo-900 uppercase italic">Prescripción <span id="medCount" class="badge-count">0</span></h2>
+                <h2 class="text-[10px] font-black text-slate-500 uppercase italic">3. Prescripción <span id="medCount" class="badge-count">0</span></h2>
                 <button onclick="limpiarManual()" class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase">Limpiar</button>
             </div>
-            <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full p-4 rounded-2xl font-black outline-none shadow-sm" placeholder="Buscar fármaco..." autocomplete="off">
+            <input type="text" id="farmaInput" oninput="handleSearch(this.value)" class="w-full p-4 rounded-2xl outline-none shadow-sm" placeholder="Añadir fármaco..." autocomplete="off">
             <div id="sugCont" class="hidden"></div>
             <div id="listaSeleccionados" class="mt-4"></div>
         </section>
@@ -90,7 +90,7 @@
     </main>
 
     <footer class="fixed bottom-0 left-0 right-0 p-4 bg-white/95 flex gap-3 border-t border-slate-200 z-40">
-        <button onclick="ejecutarAnalisis()" class="flex-1 bg-indigo-950 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl italic">Analizar</button>
+        <button onclick="ejecutarAnalisis()" class="flex-1 bg-slate-900 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl italic">Analizar Prescripción</button>
         <button id="btnPdf" onclick="descargarReporte()" class="hidden bg-red-600 text-white w-24 rounded-2xl flex items-center justify-center font-black uppercase text-[10px]">PDF</button>
     </footer>
 
@@ -98,7 +98,19 @@
         let DB_MEDS = []; let DB_RULES = []; let seleccionados = [];
         let final_dup = []; let final_int = []; let final_beers = []; flagTriple = false; let tMeds = "";
 
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js?v=6007').then(reg => reg.update()); }
+        // SERVICE WORKER DINÁMICO PARA OFFLINE TOTAL
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'vigilancia-v65';
+                self.addEventListener('install', (e) => {
+                    e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['./', './index.html'])));
+                });
+                self.addEventListener('fetch', (e) => {
+                    e.respondWith(caches.match(e.request).then((res) => res || fetch(e.request)));
+                });`;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob));
+        }
 
         window.onload = () => {
             const m = localStorage.getItem('pwa_meds'); const r = localStorage.getItem('pwa_rules');
@@ -114,7 +126,7 @@
         async function procesarArchivos() {
             const fM = document.getElementById('csvMeds').files[0];
             const fI = document.getElementById('csvInts').files[0];
-            if(!fM || !fI) return alert("Cargue ambos archivos.");
+            if(!fM || !fI) return alert("Seleccione ambos archivos CSV.");
             try {
                 const tM = await fM.text(); const lM = tM.split(/\r?\n/).filter(l => l.trim() !== "");
                 const sepM = lM[0].includes(';') ? ';' : ','; DB_MEDS = [];
@@ -127,13 +139,12 @@
                 lI.forEach(l => {
                     const c = l.split(sepI).map(v => v.replace(/"/g, '').trim());
                     if(c.length >= 4 && c[0] && !c[0].toUpperCase().includes("ATC")) {
-                        let msg = c[2].replace(/BEERS 2023 - /gi, "PIM: ").replace(/BEERS/gi, "PIM");
-                        DB_RULES.push({ a: c[0].toUpperCase(), b: c[1].toUpperCase(), msg: msg, act: c[3].replace(/,$/, "").trim() });
+                        DB_RULES.push({ a: c[0].toUpperCase(), b: c[1].toUpperCase(), msg: c[2], act: c[3].trim() });
                     }
                 });
                 localStorage.setItem('pwa_meds', JSON.stringify(DB_MEDS)); localStorage.setItem('pwa_rules', JSON.stringify(DB_RULES));
-                actualizarEstadoUI(); alert("Sincronización v60.07 Exitosa.");
-            } catch(e) { alert("Error: " + e.message); }
+                actualizarEstadoUI(); alert("Sincronización v65.00 Completada.");
+            } catch(e) { alert("Error de Sincronización: " + e.message); }
         }
 
         function handleSearch(val) {
@@ -158,13 +169,13 @@
             const cont = document.getElementById('listaSeleccionados');
             cont.innerHTML = seleccionados.map((m, i) => `
                 <div class="med-row">
-                    <div class="med-info"><span class="font-black uppercase text-indigo-900">${m.name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${m.atc}</span></div>
+                    <div class="med-info"><span class="font-black uppercase text-slate-800">${m.name}</span><br><span class="text-[9px] text-emerald-600 font-mono">${m.atc}</span></div>
                     <button onclick="seleccionados.splice(${i},1); renderLista(); actualizarEstadoUI();" class="text-red-500 font-bold p-2">✕</button>
                 </div>`).join('');
         }
 
         function limpiarManual() {
-            if(confirm("¿Limpiar todo?")) {
+            if(confirm("¿Desea limpiar toda la prescripción?")) {
                 seleccionados = []; renderLista(); actualizarEstadoUI();
                 document.getElementById('pNombre').value = ""; document.getElementById('pEdad').value = ""; document.getElementById('pPeso').value = "";
                 document.getElementById('resultados').classList.add('hidden'); document.getElementById('btnPdf').classList.add('hidden');
@@ -175,38 +186,33 @@
             if(seleccionados.length < 1) return;
             const edad = parseInt(document.getElementById('pEdad').value) || 0;
             document.getElementById('resultados').classList.remove('hidden'); document.getElementById('btnPdf').classList.remove('hidden');
-            
             const rD = document.getElementById('resDup'); rD.innerHTML = "";
             const rIMaj = document.getElementById('resIntMajor'); rIMaj.innerHTML = "";
             const rIMod = document.getElementById('resIntMod'); rIMod.innerHTML = "";
             const rB = document.getElementById('resBeers'); rB.innerHTML = "";
             const aT = document.getElementById('alertaTriple'); aT.classList.add('hidden');
-            
-            document.getElementById('boxDup').classList.add('hidden');
-            document.getElementById('boxIntMajor').classList.add('hidden');
-            document.getElementById('boxIntMod').classList.add('hidden');
-            document.getElementById('boxBeers').classList.add('hidden');
+            document.getElementById('boxDup').classList.add('hidden'); document.getElementById('boxIntMajor').classList.add('hidden');
+            document.getElementById('boxIntMod').classList.add('hidden'); document.getElementById('boxBeers').classList.add('hidden');
 
             final_dup = []; final_int = []; final_beers = []; flagTriple = false; tMeds = "";
             let hallazgos = {};
 
-            const medsAINE = seleccionados.filter(m => m.atc.startsWith("M01A"));
-            const medsRAAS = seleccionados.filter(m => m.atc.startsWith("C09"));
-            const medsDIUR = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.includes("C09BA") || m.atc.includes("C09DA") || m.atc.includes("C09DX"));
-            if(medsAINE.length && medsRAAS.length && medsDIUR.length) {
+            // TRIPLE WHAMMY
+            const mAine = seleccionados.filter(m => m.atc.startsWith("M01A"));
+            const mRaas = seleccionados.filter(m => m.atc.startsWith("C09"));
+            const mDiur = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.includes("C09BA") || m.atc.includes("C09DA") || m.atc.includes("C09DX"));
+            if(mAine.length && mRaas.length && mDiur.length) {
                 flagTriple = true;
-                tMeds = `AINE: ${medsAINE.map(m=>m.name).join(', ')} | RAAS: ${medsRAAS.map(m=>m.name).join(', ')} | DIURÉTICO: ${medsDIUR.map(m=>m.name).join(', ')}`;
-                aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 TRIPLE WHAMMY DETECTADO<br><span class="text-[8px] font-medium italic">${tMeds}</span></div>`;
+                tMeds = `AINE: ${mAine.map(m=>m.name).join(', ')} | RAAS: ${mRaas.map(m=>m.name).join(', ')} | DIURÉTICO: ${mDiur.map(m=>m.name).join(', ')}`;
+                aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 ALERTA: TRIPLE WHAMMY DETECTADO<br><span class="text-[8px] font-medium italic">${tMeds}</span></div>`;
                 aT.classList.remove('hidden');
             }
 
-            // DUPLICIDAD v60.07 (Blindaje BENZO y SNC)
+            // DUPLICIDAD v65.00
             let grps = {}; 
             seleccionados.forEach(m => { 
                 let p = (m.atc.startsWith("C03") || m.atc.startsWith("C09")) ? m.atc.substring(0,3) : m.atc.substring(0,4);
-                if(m.atc.startsWith("N03AE") || m.atc.startsWith("N05BA") || m.atc.startsWith("N05CD") || m.name.includes("CLONAZEPAM") || m.name.includes("DIAZEPAM")) {
-                    p = "BENZO";
-                }
+                if(m.atc.startsWith("N03AE") || m.atc.startsWith("N05BA") || m.atc.startsWith("N05CD")) p = "BENZO";
                 if(!grps[p]) grps[p]=[]; grps[p].push(m.name); 
             });
             for(let p in grps) {
@@ -218,48 +224,54 @@
                 }
             }
 
-            // MOTOR v60.07 (EXCLUSIÓN 360° Y BLINDAJE DE IDENTIDAD)
-            const sortedRules = [...DB_RULES].sort((a,b) => (b.a.length + b.b.length) - (a.a.length + a.b.length));
+            // MOTOR v65.00 BLINDAJE DE IDENTIDAD TOTAL
+            const sortedRules = [...DB_RULES].sort((a,b) => b.a.length - a.a.length);
 
             for(let m1 of seleccionados) {
                 for(let ru of sortedRules) {
-                    const m1Match = m1.atc.startsWith(ru.a) || ru.a.startsWith(m1.atc);
+                    // Match estricto por prefijo: Priorizamos 7 chars sobre 5 sobre 4.
+                    const m1Match = m1.atc.startsWith(ru.a);
                     if(m1Match) {
                         const msgU = ru.msg.toUpperCase();
-                        const isPim = msgU.includes("PIM") || msgU.includes("GERIATRICO") || msgU.includes("CRITERIO");
+                        const isPim = msgU.includes("PIM") || msgU.includes("GERIATRICO") || msgU.includes("CRITERIO") || msgU.includes("BEERS");
                         
-                        // FILTROS DE IDENTIDAD BLINDADOS v60.07 (Aplica a M1 y M2)
-                        const testExclusion = (n) => {
-                            if(n.includes("ALOPURINOL") && msgU.includes("COLCHICINA")) return true;
-                            if(n.includes("METRONIDAZOL") && msgU.includes("NITROFURANTOINA")) return true;
-                            if(n.includes("CLONAZEPAM") && msgU.includes("GABAPENTIN")) return true;
-                            if((n.includes("SERTRALINA") || n.includes("FLUOXETINA")) && msgU.includes("TRICICLICO")) return true;
-                            if(n.includes("AMITRIPTILINA") && msgU.includes("ISRS")) return true;
-                            return false;
-                        };
-
-                        if(testExclusion(m1.name)) continue;
+                        // FILTRO DE EXCLUSIÓN v65.00 (Muros Sanitarios)
+                        if(m1.name.includes("METRONIDAZOL") && msgU.includes("NITROFURANTOINA")) continue;
+                        if(m1.name.includes("ALOPURINOL") && msgU.includes("COLCHICINA")) continue;
+                        if(m1.name.includes("CLONAZEPAM") && msgU.includes("GABAPENTIN")) continue;
+                        if(m1.name.includes("LINEZOLID") && msgU.includes("NITROFURANTOINA")) continue;
+                        if((m1.name.includes("SERTRALINA") || m1.name.includes("FLUOXETINA") || m1.name.includes("ESCITALOPRAM")) && msgU.includes("TRICICLICO")) continue;
+                        if(m1.name.includes("AMITRIPTILINA") && msgU.includes("ISRS")) continue;
 
                         if(ru.a === ru.b) {
                             if(isPim && edad >= 65) {
                                 const k = `PIM_${m1.name}`;
-                                if(!hallazgos[k] || ru.a.length > hallazgos[k].priority) hallazgos[k] = { ...ru, disp: m1.name, priority: ru.a.length, type: 'PIM' };
+                                if(!hallazgos[k] || ru.a.length > hallazgos[k].priority) {
+                                    hallazgos[k] = { ...ru, disp: m1.name, priority: ru.a.length, type: 'PIM' };
+                                }
                             }
                         } else {
                             for(let m2 of seleccionados) {
                                 if(m1.name === m2.name) continue;
-                                const m2Match = m2.atc.startsWith(ru.b) || ru.b.startsWith(m2.atc);
+                                const m2Match = m2.atc.startsWith(ru.b);
                                 if(m2Match) {
-                                    if(testExclusion(m2.name)) continue;
                                     const pair = [m1.name, m2.name].sort();
                                     const k = `INT_${pair[0]}_${pair[1]}`;
                                     if(isPim && edad < 65) continue;
+                                    
                                     if(!hallazgos[k] || (ru.a.length + ru.b.length) > hallazgos[k].priority) {
-                                        // INYECCIÓN DINÁMICA DE NOMBRES v60.07
+                                        // LIMPIEZA DINÁMICA DE MENSAJE v65.00
                                         let finalMsg = ru.msg;
-                                        if(finalMsg.toUpperCase().includes("NIVELES") && !finalMsg.toUpperCase().includes(pair[0])) {
-                                            finalMsg += ` (Sustancia afectada: ${m2.name})`;
+                                        // Direccionalidad v65.00: Quien es el afectado
+                                        let affected = m2.name;
+                                        if(m1.atc.startsWith("J02") || m1.atc.startsWith("J01F")) affected = m2.name; // El azol o macrolido afecta al otro
+                                        if(m2.atc.startsWith("C10")) affected = m2.name; // La estatina suele ser la afectada
+
+                                        if(finalMsg.toUpperCase().includes("NIVELES")) {
+                                            finalMsg = finalMsg.split(':')[1] || finalMsg;
+                                            finalMsg = `Afecta niveles plasmáticos de ${affected}. ${finalMsg}`;
                                         }
+
                                         hallazgos[k] = { ...ru, msg: finalMsg, disp: `${pair[0]} + ${pair[1]}`, priority: (ru.a.length + ru.b.length), type: isPim ? 'PIM' : (ru.act.toUpperCase().includes("EVITAR") ? "GRAVE" : "MODERADA") };
                                     }
                                 }
@@ -271,11 +283,15 @@
 
             for(let id in hallazgos) {
                 const h = hallazgos[id];
-                let cleanMsg = h.msg.split(':').slice(1).join(':').trim() || h.msg;
-                const content = `<div class="mb-2 border-b pb-1"><b>${h.disp}</b><br>${cleanMsg}<br><span class="italic uppercase font-bold text-[9px]">Acción: ${h.act}</span></div>`;
-                if(h.type === 'PIM') { final_beers.push({ meds: h.disp, desc: cleanMsg, act: h.act }); rB.innerHTML += content; document.getElementById('boxBeers').classList.remove('hidden'); }
-                else if(h.type === 'GRAVE') { final_int.push({ meds: h.disp, desc: cleanMsg, act: h.act, type: "GRAVE" }); rIMaj.innerHTML += content; document.getElementById('boxIntMajor').classList.remove('hidden'); }
-                else { final_int.push({ meds: h.disp, desc: cleanMsg, act: h.act, type: "MODERADA" }); rIMod.innerHTML += content; document.getElementById('boxIntMod').classList.remove('hidden'); }
+                // Limpiamos el mensaje de nombres fijos del CSV
+                let displayMsg = h.msg.replace(/FLUNITRAZEPAM/gi, h.disp).replace(/CITALOPRAM/gi, h.disp).replace(/CLONAZEPAM/gi, h.disp).replace(/AMITRIPTILINA/gi, h.disp);
+                // Si el mensaje tiene dos puntos, solo mostramos lo que hay después (el riesgo real)
+                if(displayMsg.includes(':')) displayMsg = displayMsg.split(':').pop().trim();
+
+                const content = `<div class="mb-2 border-b pb-1"><b>${h.disp}</b><br>${displayMsg}<br><span class="italic uppercase font-bold text-[9px]">Acción: ${h.act}</span></div>`;
+                if(h.type === 'PIM') { final_beers.push({ meds: h.disp, desc: displayMsg, act: h.act }); rB.innerHTML += content; document.getElementById('boxBeers').classList.remove('hidden'); }
+                else if(h.type === 'GRAVE') { final_int.push({ meds: h.disp, desc: displayMsg, act: h.act, type: "GRAVE" }); rIMaj.innerHTML += content; document.getElementById('boxIntMajor').classList.remove('hidden'); }
+                else { final_int.push({ meds: h.disp, desc: displayMsg, act: h.act, type: "MODERADA" }); rIMod.innerHTML += content; document.getElementById('boxIntMod').classList.remove('hidden'); }
             }
         }
 
@@ -293,7 +309,7 @@
                 doc.setFillColor(241, 245, 249); doc.rect(15, curY, pW - 30, 25, 'F');
                 doc.setTextColor(30, 41, 59); doc.setFontSize(10); doc.setFont("helvetica", "bold");
                 doc.text("RESUMEN DE HALLAZGOS", 20, curY + 7);
-                doc.setFont("helvetica", "normal"); doc.setFontSize(8);
+                doc.setFontSize(8); doc.setFont("helvetica", "normal");
                 doc.text(`Fármacos Analizados: ${seleccionados.length}`, 20, curY + 14);
                 doc.text(`Duplicidades: ${final_dup.length}`, 70, curY + 14);
                 doc.text(`Interacciones Graves: ${final_int.filter(i=>i.type==="GRAVE").length}`, 115, curY + 14);
@@ -310,8 +326,13 @@
                 const mod = final_int.filter(i => i.type === "MODERADA");
                 if(mod.length) { doc.setFontSize(11); doc.setTextColor(150, 150, 0); doc.text("INTERACCIONES MODERADAS", 15, curY); doc.autoTable({ startY: curY+5, head: [['FÁRMACO', 'RIESGO', 'ACCIÓN']], body: mod.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [217, 119, 6]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
                 if(final_beers.length) { doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS GERIÁTRICOS (PIM)", 15, curY); doc.autoTable({ startY: curY+5, head: [['FÁRMACO', 'RIESGO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); }
+                
                 const totalPages = doc.internal.getNumberOfPages();
-                for (let i = 1; i <= totalPages; i++) { doc.setPage(i); doc.setFontSize(7); doc.setTextColor(100); doc.text("Esta aplicación es una herramienta de apoyo clínico. La responsabilidad es del médico tratante.", 15, pH - 10); doc.text(`Página ${i} de ${totalPages}`, pW - 30, pH - 10); }
+                for (let i = 1; i <= totalPages; i++) {
+                    doc.setPage(i); doc.setFontSize(7); doc.setTextColor(100);
+                    doc.text("Esta aplicación es una herramienta de apoyo clínico. La responsabilidad es del médico tratante.", 15, pH - 10);
+                    doc.text(`Página ${i} de ${totalPages}`, pW - 30, pH - 10);
+                }
                 doc.save(`Vigilancia_${pac}.pdf`);
             } catch(e) { alert("Error PDF: " + e.message); }
         }
