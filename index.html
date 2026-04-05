@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v70.00</title>
+    <title>Vigilancia Móvil v70.01</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,7 +25,7 @@
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
             <div class="bg-slate-800 p-6 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-2xl font-black italic text-emerald-400">VIGILANCIA MÓVIL</h1>
-                <p class="text-[10px] uppercase font-bold mt-1">v70.00 • INTELIGENCIA TERAPÉUTICA</p>
+                <p class="text-[10px] uppercase font-bold mt-1">v70.01 • SEGURIDAD DE CLASE</p>
             </div>
             <div class="p-8 space-y-4 text-justify text-[11.5px] text-slate-800 font-medium">
                 <p class="font-black text-red-600 text-center uppercase border-b pb-2">Aviso de Advertencia</p>
@@ -36,7 +36,7 @@
     </div>
 
     <header class="bg-slate-900 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic text-xs text-emerald-400">Vigilancia v70.00</h1>
+        <h1 class="font-black uppercase italic text-xs text-emerald-400">Vigilancia v70.01</h1>
         <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
     </header>
 
@@ -100,7 +100,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=70').catch(err => console.log("SW Fail", err));
+                navigator.serviceWorker.register('./sw.js?v=7001').catch(err => console.log("SW Fail", err));
             });
         }
 
@@ -135,7 +135,7 @@
                     }
                 });
                 localStorage.setItem('pwa_meds', JSON.stringify(DB_MEDS)); localStorage.setItem('pwa_rules', JSON.stringify(DB_RULES));
-                actualizarEstadoUI(); alert("Sincronización v70.00 Exitosa.");
+                actualizarEstadoUI(); alert("Sincronización v70.01 Completada.");
             } catch(e) { alert("Error: " + e.message); }
         }
 
@@ -167,7 +167,7 @@
         }
 
         function limpiarManual() {
-            if(confirm("¿Limpiar todo?")) {
+            if(confirm("¿Limpiar toda la prescripción?")) {
                 seleccionados = []; renderLista(); actualizarEstadoUI();
                 document.getElementById('pNombre').value = ""; document.getElementById('pEdad').value = ""; document.getElementById('pPeso').value = "";
                 document.getElementById('resultados').classList.add('hidden'); document.getElementById('btnPdf').classList.add('hidden');
@@ -183,13 +183,14 @@
             const rIMod = document.getElementById('resIntMod'); rIMod.innerHTML = "";
             const rB = document.getElementById('resBeers'); rB.innerHTML = "";
             const aT = document.getElementById('alertaTriple'); aT.classList.add('hidden');
-            document.getElementById('boxDup').classList.add('hidden'); document.getElementById('boxIntMajor').classList.add('hidden');
-            document.getElementById('boxIntMod').classList.add('hidden'); document.getElementById('boxBeers').classList.add('hidden');
+            document.getElementById('boxDup').classList.add('hidden');
+            document.getElementById('boxIntMajor').classList.add('hidden');
+            document.getElementById('boxIntMod').classList.add('hidden');
+            document.getElementById('boxBeers').classList.add('hidden');
 
             final_dup = []; final_int = []; final_beers = []; flagTriple = false; tMeds = "";
             let hallazgos = {};
 
-            // TRIPLE WHAMMY
             const mAine = seleccionados.filter(m => m.atc.startsWith("M01A"));
             const mRaas = seleccionados.filter(m => m.atc.startsWith("C09") || m.atc.startsWith("C09X"));
             const mDiur = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.includes("C09BA") || m.atc.includes("C09DA"));
@@ -200,7 +201,6 @@
                 aT.classList.remove('hidden');
             }
 
-            // DUPLICIDAD v70.00
             let grps = {}; 
             seleccionados.forEach(m => { 
                 let p = m.atc.substring(0,4);
@@ -218,7 +218,6 @@
                 }
             }
 
-            // MOTOR v70.00 BLINDAJE DE IDENTIDAD Y DIRECCIONALIDAD
             const sortedRules = [...DB_RULES].sort((a,b) => b.a.length - a.a.length);
 
             for(let m1 of seleccionados) {
@@ -228,17 +227,27 @@
                         const msgU = ru.msg.toUpperCase();
                         const isPim = msgU.includes("PIM") || msgU.includes("GERIATRICO") || msgU.includes("CRITERIO");
                         
-                        // FILTRO DE EXCLUSIÓN v70.00
                         if(m1.name.includes("LINEZOLID") && msgU.includes("NITROFURANTOINA")) continue;
                         if(m1.name.includes("METRONIDAZOL") && msgU.includes("NITROFURANTOINA")) continue;
                         if(m1.name.includes("ALOPURINOL") && msgU.includes("COLCHICINA")) continue;
                         if(m1.name.includes("CLONAZEPAM") && msgU.includes("GABAPENTIN")) continue;
-                        if((m1.name.includes("FLUOXETINA") || m1.name.includes("SERTRALINA")) && msgU.includes("TRICICLICO")) continue;
 
+                        // Lógica v70.01: Permitir reglas de clase (A==B) como interacciones si hay múltiples fármacos
                         if(ru.a === ru.b) {
                             if(isPim && edad >= 65) {
                                 const k = `PIM_${m1.name}`;
                                 if(!hallazgos[k] || ru.a.length > hallazgos[k].priority) hallazgos[k] = { ...ru, disp: m1.name, priority: ru.a.length, type: 'PIM' };
+                            } else if (!isPim) {
+                                // Es una regla de clase (ej: Estatina + Estatina)
+                                for(let m2 of seleccionados) {
+                                    if(m1.name !== m2.name && m2.atc.startsWith(ru.b)) {
+                                        const pair = [m1.name, m2.name].sort();
+                                        const k = `INT_${pair[0]}_${pair[1]}`;
+                                        if(!hallazgos[k] || (ru.a.length + ru.b.length) > hallazgos[k].priority) {
+                                            hallazgos[k] = { ...ru, disp: `${pair[0]} + ${pair[1]}`, priority: (ru.a.length + ru.b.length), type: (ru.act.toUpperCase().includes("EVITAR") ? "GRAVE" : "MODERADA") };
+                                        }
+                                    }
+                                }
                             }
                         } else {
                             for(let m2 of seleccionados) {
@@ -247,18 +256,13 @@
                                     const pair = [m1.name, m2.name].sort();
                                     const k = `INT_${pair[0]}_${pair[1]}`;
                                     if(isPim && edad < 65) continue;
-                                    
                                     if(!hallazgos[k] || (ru.a.length + ru.b.length) > hallazgos[k].priority) {
-                                        // LÓGICA DE DIRECCIONALIDAD v70.00
                                         let victim = m2.name;
-                                        if(ru.a.startsWith("J02") || ru.a.startsWith("J01F") || ru.a.startsWith("N03A")) victim = m2.name;
-                                        if(ru.b.startsWith("C10") || ru.b.startsWith("B01")) victim = m2.name;
+                                        if(ru.a.startsWith("J02") || ru.a.startsWith("J01F")) victim = m2.name;
+                                        if(ru.b.startsWith("C10")) victim = m2.name;
 
                                         let finalMsg = ru.msg;
-                                        if(finalMsg.toUpperCase().includes("NIVELES")) {
-                                            finalMsg = `En esta combinación, **${victim}** es la sustancia afectada. ${finalMsg}`;
-                                        }
-
+                                        if(finalMsg.toUpperCase().includes("NIVELES")) finalMsg = `Sustancia afectada: **${victim}**. ${finalMsg}`;
                                         hallazgos[k] = { ...ru, msg: finalMsg, disp: `${pair[0]} + ${pair[1]}`, priority: (ru.a.length + ru.b.length), type: isPim ? 'PIM' : (ru.act.toUpperCase().includes("EVITAR") ? "GRAVE" : "MODERADA") };
                                     }
                                 }
