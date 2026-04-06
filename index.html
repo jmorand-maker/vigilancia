@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v70.02</title>
+    <title>Vigilancia Móvil v70.03</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,7 +25,7 @@
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
             <div class="bg-slate-800 p-6 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-2xl font-black italic text-emerald-400">VIGILANCIA MÓVIL</h1>
-                <p class="text-[10px] uppercase font-bold mt-1">v70.02 • VERSIÓN FINAL</p>
+                <p class="text-[10px] uppercase font-bold mt-1">v70.03 • COBERTURA DE FAMILIA</p>
             </div>
             <div class="p-8 space-y-4 text-justify text-[11.5px] text-slate-800 font-medium">
                 <p class="font-black text-red-600 text-center uppercase border-b pb-2">Aviso de Advertencia</p>
@@ -36,7 +36,7 @@
     </div>
 
     <header class="bg-slate-900 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="font-black uppercase italic text-xs text-emerald-400">Vigilancia v70.02</h1>
+        <h1 class="font-black uppercase italic text-xs text-emerald-400">Vigilancia v70.03</h1>
         <div id="status" class="sync-status bg-slate-800 text-slate-400 italic">Offline</div>
     </header>
 
@@ -98,10 +98,9 @@
         let DB_MEDS = []; let DB_RULES = []; let seleccionados = [];
         let final_dup = []; let final_int = []; let final_beers = []; flagTriple = false; let tMeds = "";
 
-        // Service Worker interno para Offline Total
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'vigilancia-v7002';
+                const CACHE_NAME = 'vigilancia-v7003';
                 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./', 'index.html']))));
                 self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
             `;
@@ -140,7 +139,7 @@
                     }
                 });
                 localStorage.setItem('pwa_meds', JSON.stringify(DB_MEDS)); localStorage.setItem('pwa_rules', JSON.stringify(DB_RULES));
-                actualizarEstadoUI(); alert("Éxito v70.02");
+                actualizarEstadoUI(); alert("Sincronización v70.03 Exitosa.");
             } catch(e) { alert("Error: " + e.message); }
         }
 
@@ -204,12 +203,17 @@
                 aT.classList.remove('hidden');
             }
 
+            // DUPLICIDAD TRANSVERSAL v70.03
             let grps = {}; 
             seleccionados.forEach(m => { 
                 let p = m.atc.substring(0,4);
+                // Lógica de Súper-Familia
+                if(m.atc.startsWith("C10")) p = "LÍPIDOS/ESTATINAS"; // Une C10A y C10B
+                if(m.atc.startsWith("C09A") || m.atc.startsWith("C09B")) p = "IECA/COMB.";
+                if(m.atc.startsWith("C09C") || m.atc.startsWith("C09D") || m.atc.startsWith("C09X")) p = "ARA II/RENINA";
                 if(m.atc.startsWith("N03AE") || m.atc.startsWith("N05BA") || m.atc.startsWith("N05CD")) p = "BENZO/SED";
                 if(m.atc.startsWith("N06AB")) p = "ISRS/DEP";
-                if(m.atc.startsWith("C10AA")) p = "ESTATINA";
+                
                 if(!grps[p]) grps[p]=[]; grps[p].push(m.name); 
             });
             for(let p in grps) {
@@ -232,7 +236,6 @@
                         if(m1.name.includes("LINEZOLID") && msgU.includes("NITROFURANTOINA")) continue;
                         if(m1.name.includes("METRONIDAZOL") && msgU.includes("NITROFURANTOINA")) continue;
                         if(m1.name.includes("ALOPURINOL") && msgU.includes("COLCHICINA")) continue;
-                        if(m1.name.includes("CLONAZEPAM") && msgU.includes("GABAPENTIN")) continue;
 
                         if(ru.a === ru.b) {
                             if(isPim && edad >= 65) {
@@ -286,10 +289,10 @@
                 const { jsPDF } = window.jspdf; const doc = new jsPDF({ format: 'letter' });
                 const pW = doc.internal.pageSize.getWidth(); const pH = doc.internal.pageSize.getHeight();
                 let pac = (document.getElementById('pNombre').value || "ANÓNIMO").toUpperCase();
-                const legal = "“Esta aplicación es una herramienta de apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante. La información no sustituye la consulta médica ni el criterio del especialista.”";
+                const legal = "Esta aplicacion es una herramienta de apoyo a la decision clinica. Los resultados son sugerencias basadas en bases de datos farmacologicas y deben ser validados mediante el juicio del medico tratante. La informacion no sustituye la consulta medica ni el criterio del especialista.";
 
                 doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 40, 'F');
-                doc.setTextColor(16, 185, 129); doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("VIGILANCIA FARMACOLÓGICA", 15, 20);
+                doc.setTextColor(16, 185, 129); doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("VIGILANCIA FARMACOLOGICA", 15, 20);
                 doc.setTextColor(255); doc.setFontSize(9); doc.text(`Paciente: ${pac} | Edad: ${document.getElementById('pEdad').value || "--"} | Peso: ${document.getElementById('pPeso').value || "--"} kg`, 15, 30);
                 doc.text(`Fecha: ${new Date().toLocaleDateString()}`, pW - 50, 30);
                 
@@ -298,27 +301,35 @@
                 doc.setTextColor(30, 41, 59); doc.setFontSize(10); doc.setFont("helvetica", "bold");
                 doc.text("RESUMEN DE HALLAZGOS", 20, curY + 7);
                 doc.setFontSize(8); doc.setFont("helvetica", "normal");
-                doc.text(`Fármacos Analizados: ${seleccionados.length}`, 20, curY + 14);
-                doc.text(`Duplicidades Terapéuticas: ${final_dup.length}`, 75, curY + 14);
+                doc.text(`Farmacos Analizados: ${seleccionados.length}`, 20, curY + 14);
+                doc.text(`Duplicidades Terapeuticas: ${final_dup.length}`, 75, curY + 14);
                 doc.text(`Interacciones Graves: ${final_int.filter(i=>i.type==="GRAVE").length}`, 130, curY + 14);
                 doc.text(`Interacciones Moderadas: ${final_int.filter(i=>i.type==="MODERADA").length}`, 20, curY + 20);
                 doc.text(`Criterios PIM Detectados: ${final_beers.length}`, 75, curY + 20);
 
-                doc.autoTable({ startY: curY + 30, head: [['FÁRMACO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 8 } });
+                doc.autoTable({ startY: curY + 30, head: [['FARMACO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 8 } });
                 curY = doc.lastAutoTable.finalY + 10;
-                if(flagTriple) { doc.setTextColor(185, 28, 28); doc.setFontSize(11); doc.text("🚨 ALERTA: TRIPLE WHAMMY DETECTADO", 15, curY); curY += 5; doc.setTextColor(80); doc.setFontSize(7); doc.text(tMeds, 15, curY, { maxWidth: 180 }); curY += 12; }
-                if(final_dup.length) { doc.setFontSize(11); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAPÉUTICA", 15, curY); doc.autoTable({ startY: curY+5, head: [['GRUPO', 'FÁRMACO']], body: final_dup.map(d => [d.grp, d.meds.join(' + ')]), headStyles: {fillColor: [217, 119, 6]}, styles: {fontSize: 8} }); curY = doc.lastAutoTable.finalY + 10; }
+                
+                // Texto de Triple Whammy sanitizado (sin emojis para el PDF)
+                if(flagTriple) { 
+                    doc.setTextColor(185, 28, 28); doc.setFontSize(11); 
+                    doc.text("ALERTA: TRIPLE WHAMMY DETECTADO", 15, curY); 
+                    curY += 5; doc.setTextColor(80); doc.setFontSize(7); 
+                    doc.text(tMeds, 15, curY, { maxWidth: 180 }); curY += 12; 
+                }
+
+                if(final_dup.length) { doc.setFontSize(11); doc.setTextColor(217, 119, 6); doc.text("DUPLICIDAD TERAPEUTICA", 15, curY); doc.autoTable({ startY: curY+5, head: [['GRUPO', 'FARMACO']], body: final_dup.map(d => [d.grp, d.meds.join(' + ')]), headStyles: {fillColor: [217, 119, 6]}, styles: {fontSize: 8} }); curY = doc.lastAutoTable.finalY + 10; }
                 const graves = final_int.filter(i => i.type === "GRAVE");
-                if(graves.length) { doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES GRAVES", 15, curY); doc.autoTable({ startY: curY+5, head: [['FÁRMACO', 'RIESGO', 'ACCIÓN']], body: graves.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
+                if(graves.length) { doc.setFontSize(11); doc.setTextColor(185, 28, 28); doc.text("INTERACCIONES GRAVES", 15, curY); doc.autoTable({ startY: curY+5, head: [['FARMACO', 'RIESGO', 'ACCION']], body: graves.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [185, 28, 28]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
                 const mod = final_int.filter(i => i.type === "MODERADA");
-                if(mod.length) { doc.setFontSize(11); doc.setTextColor(150, 150, 0); doc.text("INTERACCIONES MODERADAS", 15, curY); doc.autoTable({ startY: curY+5, head: [['FÁRMACO', 'RIESGO', 'ACCIÓN']], body: mod.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [217, 119, 6]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
-                if(final_beers.length) { doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS GERIÁTRICOS (PIM)", 15, curY); doc.autoTable({ startY: curY+5, head: [['FÁRMACO', 'RIESGO', 'ACCIÓN']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); }
+                if(mod.length) { doc.setFontSize(11); doc.setTextColor(150, 150, 0); doc.text("INTERACCIONES MODERADAS", 15, curY); doc.autoTable({ startY: curY+5, head: [['FARMACO', 'RIESGO', 'ACCION']], body: mod.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [217, 119, 6]}, styles: { fontSize: 7 } }); curY = doc.lastAutoTable.finalY + 10; }
+                if(final_beers.length) { doc.setFontSize(11); doc.setTextColor(37, 99, 235); doc.text("CRITERIOS GERIATRICOS (PIM)", 15, curY); doc.autoTable({ startY: curY+5, head: [['FARMACO', 'RIESGO', 'ACCION']], body: final_beers.map(h => [h.meds, h.desc, h.act]), headStyles: {fillColor: [37, 99, 235]}, styles: { fontSize: 7 } }); }
                 
                 const totalPages = doc.internal.getNumberOfPages();
                 for (let i = 1; i <= totalPages; i++) {
                     doc.setPage(i); doc.setFontSize(6); doc.setTextColor(120);
                     doc.text(legal, 15, pH - 15, { maxWidth: pW - 30 });
-                    doc.text(`Página ${i} de ${totalPages}`, pW - 30, pH - 8);
+                    doc.text(`Pagina ${i} de ${totalPages}`, pW - 30, pH - 8);
                 }
                 doc.save(`Vigilancia_${pac}.pdf`);
             } catch(e) { alert("Error PDF: " + e.message); }
