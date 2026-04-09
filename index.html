@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vigilancia Móvil v90.00</title>
+    <title>Vigilancia Móvil v95.00</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,7 +25,7 @@
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
             <div class="bg-slate-800 p-6 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-2xl font-black italic text-emerald-400">VIGILANCIA MÓVIL</h1>
-                <p class="text-[10px] uppercase font-bold mt-1">v90.00 • RIGOR CLÍNICO</p>
+                <p class="text-[10px] uppercase font-bold mt-1">v95.00 • ESPECIFICIDAD DE MOLÉCULA</p>
             </div>
             <div class="p-8 space-y-4 text-justify text-[11.5px] text-slate-800 font-medium">
                 <p class="font-black text-red-600 text-center uppercase border-b pb-2">Aviso de Advertencia</p>
@@ -35,8 +35,8 @@
         </div>
     </div>
 
-    <header class="bg-slate-900 text-white p-5 shadow-xl border-b-4 border-emerald-500 flex justify-between items-center sticky top-0 z-50">
-        <h1 class="font-black uppercase italic text-xs text-emerald-400">Vigilancia v90.00</h1>
+    <header class="bg-slate-900 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
+        <h1 class="font-black uppercase italic text-xs text-emerald-400">Vigilancia v95.00</h1>
         <div id="status" class="text-[9px] font-black px-3 py-1 rounded-full bg-slate-800 text-slate-400 italic">Offline</div>
     </header>
 
@@ -44,10 +44,10 @@
         <section class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
             <h2 class="text-[10px] font-black text-slate-500 uppercase italic mb-4">1. Sincronización</h2>
             <div class="space-y-3">
-                <div><label>Medicamentos (ATC7)</label><input type="file" id="csvMeds" class="text-[10px] block w-full mb-2"></div>
-                <div><label>Políticas de Interacción (v90)</label><input type="file" id="csvInts" class="text-[10px] block w-full"></div>
+                <div><label>Fármacos (ATC7)</label><input type="file" id="csvMeds" class="text-[10px] block w-full"></div>
+                <div><label>Interacciones (Master v95)</label><input type="file" id="csvInts" class="text-[10px] block w-full"></div>
             </div>
-            <button onclick="procesarArchivos()" class="w-full mt-4 bg-slate-900 text-white py-3 rounded-xl font-black text-[10px] uppercase italic">Actualizar Datos</button>
+            <button onclick="procesarArchivos()" class="w-full mt-4 bg-slate-900 text-white py-3 rounded-xl font-black text-[10px] uppercase italic">Sincronizar Bases</button>
         </section>
 
         <section class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
@@ -70,7 +70,7 @@
         <div id="resultados" class="hidden space-y-4 pb-24">
             <div id="alertaTriple" class="hidden"></div>
             <div id="boxDup" class="bg-white rounded-3xl p-5 border-l-8 border-orange-500 shadow-lg hidden">
-                <h3 class="text-orange-600 font-black text-[10px] uppercase mb-2 italic">⚠️ Duplicidad Terapéutica</h3>
+                <h3 class="text-orange-600 font-black text-[10px] uppercase mb-2">⚠️ Duplicidad Terapéutica</h3>
                 <div id="resDup" class="text-[11px] font-bold"></div>
             </div>
             <div id="boxIntMajor" class="bg-white rounded-3xl p-5 border-l-8 border-red-600 shadow-lg hidden">
@@ -89,7 +89,7 @@
     </main>
 
     <footer class="fixed bottom-0 left-0 right-0 p-4 bg-white/95 flex gap-3 border-t border-slate-200 z-40">
-        <button onclick="ejecutarAnalisis()" class="flex-1 bg-slate-900 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl italic">Analizar</button>
+        <button onclick="ejecutarAnalisis()" class="flex-1 bg-slate-900 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl italic">Analizar Prescripción</button>
         <button id="btnPdf" onclick="descargarReporte()" class="hidden bg-red-600 text-white w-24 rounded-2xl flex items-center justify-center font-black uppercase text-[10px]">PDF</button>
     </footer>
 
@@ -98,7 +98,7 @@
         let final_dup = []; let final_int = []; let final_beers = []; flagTriple = false; let tMeds = "";
 
         if ('serviceWorker' in navigator) {
-            const swCode = `const CACHE='v90'; self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','index.html'])))); self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
+            const swCode = `const CACHE='v95'; self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','index.html'])))); self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
             const b = new Blob([swCode], {type:'application/javascript'}); navigator.serviceWorker.register(URL.createObjectURL(b));
         }
 
@@ -115,12 +115,11 @@
 
         async function procesarArchivos() {
             const fM = document.getElementById('csvMeds').files[0]; const fI = document.getElementById('csvInts').files[0];
-            if(!fM || !fI) return alert("Seleccione ambos archivos.");
+            if(!fM || !fI) return alert("Seleccione ambos CSV.");
             try {
                 const tM = await fM.text(); const lM = tM.split(/\r?\n/).filter(l => l.trim() !== "");
                 const sepM = lM[0].includes(';') ? ';' : ','; DB_MEDS = [];
                 lM.forEach(l => { const c = l.split(sepM).map(v => v.replace(/"/g, '').trim()); if(c.length>=2 && c[0]) DB_MEDS.push({name:c[0].toUpperCase(), atc:c[1].toUpperCase()}); });
-                
                 const tI = await fI.text(); const lI = tI.split(/\r?\n/).filter(l => l.trim() !== "");
                 const sepI = lI[0].includes(';') ? ';' : ','; DB_RULES = [];
                 lI.forEach(l => {
@@ -132,7 +131,7 @@
                     }
                 });
                 localStorage.setItem('pwa_meds', JSON.stringify(DB_MEDS)); localStorage.setItem('pwa_rules', JSON.stringify(DB_RULES));
-                actualizarEstadoUI(); alert("Sincronización v90.00 Exitosa.");
+                actualizarEstadoUI(); alert("Sincronización v95.00 Éxitosa.");
             } catch(e) { alert("Error: " + e.message); }
         }
 
@@ -158,7 +157,7 @@
         }
 
         function limpiarManual() { 
-            if(confirm("¿Desea limpiar todos los campos?")) { 
+            if(confirm("¿Desea limpiar todos los campos del paciente y la prescripción?")) { 
                 seleccionados = []; renderLista(); actualizarEstadoUI(); 
                 document.getElementById('pNombre').value = ""; document.getElementById('pEdad').value = "";
                 document.getElementById('resultados').classList.add('hidden'); document.getElementById('btnPdf').classList.add('hidden'); 
@@ -178,6 +177,7 @@
             final_dup = []; final_int = []; final_beers = []; flagTriple = false; tMeds = "";
             let hallazgos = {};
 
+            // 1. Triple Whammy
             const mAine = seleccionados.filter(m => m.atc.startsWith("M01A"));
             const mRaas = seleccionados.filter(m => m.atc.startsWith("C09"));
             const mDiur = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.includes("C09BA") || m.atc.includes("C09DA"));
@@ -186,6 +186,7 @@
                 aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 ALERTA: TRIPLE WHAMMY DETECTADO<br><span class="text-[8px] font-medium italic">${tMeds}</span></div>`; aT.classList.remove('hidden');
             }
 
+            // 2. Duplicidades
             let grps = {};
             seleccionados.forEach(m => {
                 let p = m.atc.substring(0,4);
@@ -203,26 +204,28 @@
                 }
             }
 
-            const sortedRules = [...DB_RULES].sort((a,b) => (b.a.length + b.b.length) - (a.a.length + a.b.length));
+            // 3. MOTOR v95 (FILTRO DE SEGURIDAD ATC7)
             for(let m1 of seleccionados) {
-                for(let ru of sortedRules) {
-                    if(m1.atc.startsWith(ru.a)) {
+                for(let ru of DB_RULES) {
+                    // REGLA DE ORO: La regla DEBE ser de 7 dígitos para procesarse
+                    if(ru.a.length < 7 || ru.b.length < 7) continue;
+
+                    if(m1.atc === ru.a) {
                         const msgU = ru.msg.toUpperCase();
                         const isPim = msgU.includes("PIM") || msgU.includes("GERIATRICO") || msgU.includes("CRITERIO");
+                        
                         if(ru.a === ru.b) {
                             if(isPim && edad >= 65) {
                                 const k = `PIM_${m1.name}`;
-                                if(!hallazgos[k] || ru.a.length > hallazgos[k].priority) hallazgos[k] = { ...ru, disp: m1.name, priority: ru.a.length, type: 'PIM' };
+                                if(!hallazgos[k]) hallazgos[k] = { ...ru, disp: m1.name, type: 'PIM' };
                             }
                         } else {
                             for(let m2 of seleccionados) {
                                 if(m1.name === m2.name) continue;
-                                if(m2.atc.startsWith(ru.b)) {
-                                    const pair = [m1.name, m2.name].sort(); const k = `INT_${pair[0]}_${pair[1]}`;
-                                    const currentPriority = (ru.a.length + ru.b.length);
-                                    if(hallazgos[k] && hallazgos[k].priority > currentPriority) continue;
-                                    let finalMsg = ru.msg.replace(/CARBAMAZEPINA|FENITOINA|VALPROATO|NITROFURANTOINA|AMITRIPTILINA|CITALOPRAM/gi, m1.name);
-                                    hallazgos[k] = { ...ru, msg: finalMsg, disp: `${pair[0]} + ${pair[1]}`, priority: currentPriority, type: isPim ? 'PIM' : (ru.act.toUpperCase().includes("EVITAR") ? "GRAVE" : "MODERADA") };
+                                if(m2.atc === ru.b) {
+                                    const pair = [m1.name, m2.name].sort();
+                                    const k = `INT_${pair[0]}_${pair[1]}`;
+                                    hallazgos[k] = { ...ru, disp: `${pair[0]} + ${pair[1]}`, type: isPim ? 'PIM' : (ru.act.toUpperCase().includes("EVITAR") ? "GRAVE" : "MODERADA") };
                                 }
                             }
                         }
@@ -254,7 +257,7 @@
                 let curY = 45;
                 doc.setFillColor(241, 245, 249); doc.rect(15, curY, pW - 30, 25, 'F');
                 doc.setTextColor(30, 41, 59); doc.setFontSize(10); doc.text("RESUMEN DE HALLAZGOS", 20, curY + 7);
-                doc.setFontSize(8); doc.text(`Farmacos: ${seleccionados.length} | Duplicidades: ${final_dup.length} | Graves: ${final_int.filter(i=>i.type==="GRAVE").length} | Moderadas: ${final_int.filter(i=>i.type==="MODERADA").length} | PIM: ${final_beers.length}`, 20, curY + 16);
+                doc.setFontSize(8); doc.text(`Farmacos: ${seleccionados.length} | Graves: ${final_int.filter(i=>i.type==="GRAVE").length} | Moderadas: ${final_int.filter(i=>i.type==="MODERADA").length} | PIM: ${final_beers.length}`, 20, curY + 16);
 
                 doc.autoTable({ startY: curY + 30, head: [['FARMACO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 8 } });
                 curY = doc.lastAutoTable.finalY + 10;
