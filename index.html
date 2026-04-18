@@ -29,7 +29,7 @@
             </div>
             <div class="p-8 space-y-4 text-justify text-[11.5px] text-slate-800 font-medium">
                 <p class="font-black text-red-600 text-center uppercase border-b pb-2">Aviso de Advertencia</p>
-                <p>Esta aplicación es una herramienta de apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante. La información no sustituye la consulta médica ni el criterio del especialista.</p>
+                <p>Esta aplicación es una herramienta de apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.</p>
                 <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-slate-800 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl transition-all">ACEPTAR</button>
             </div>
         </div>
@@ -45,7 +45,7 @@
             <h2 class="text-[10px] font-black text-slate-500 uppercase italic mb-4">1. Sincronización</h2>
             <div class="space-y-3">
                 <div><label>Fármacos (Catálogo)</label><input type="file" id="csvMeds" class="text-[10px] block w-full"></div>
-                <div><label>Interacciones (DrugBank)</label><input type="file" id="csvInts" class="text-[10px] block w-full"></div>
+                <div><label>Interacciones (DrugBank Master)</label><input type="file" id="csvInts" class="text-[10px] block w-full"></div>
             </div>
             <button onclick="procesarArchivos()" class="w-full mt-4 bg-slate-900 text-white py-3 rounded-xl font-black text-[10px] uppercase italic">Sincronizar Bases</button>
         </section>
@@ -69,21 +69,25 @@
 
         <div id="resultados" class="hidden space-y-4 pb-24">
             <div id="alertaTriple" class="hidden"></div>
+            
             <div id="boxDup" class="bg-white rounded-3xl p-5 border-l-8 border-orange-500 shadow-lg hidden">
                 <h3 class="text-orange-600 font-black text-[10px] uppercase mb-2">⚠️ Duplicidad Terapéutica</h3>
                 <div id="resDup" class="text-[11px] font-bold"></div>
             </div>
+
+            <div id="boxBeers" class="bg-white rounded-3xl p-5 border-l-8 border-blue-600 shadow-lg hidden">
+                <h3 class="text-blue-600 font-black text-[10px] uppercase mb-2 italic">📘 Criterios Geriátricos (PIM)</h3>
+                <div id="resBeers" class="text-[10px] space-y-3"></div>
+            </div>
+
             <div id="boxIntMajor" class="bg-white rounded-3xl p-5 border-l-8 border-red-600 shadow-lg hidden">
                 <h3 class="text-red-600 font-black text-[10px] uppercase mb-2 italic">🛑 Interacciones Graves</h3>
                 <div id="resIntMajor" class="text-[10px] space-y-3"></div>
             </div>
+
             <div id="boxIntMod" class="bg-white rounded-3xl p-5 border-l-8 border-yellow-500 shadow-lg hidden">
                 <h3 class="text-yellow-600 font-black text-[10px] uppercase mb-2 italic">⚠️ Interacciones Moderadas</h3>
                 <div id="resIntMod" class="text-[10px] space-y-3"></div>
-            </div>
-            <div id="boxBeers" class="bg-white rounded-3xl p-5 border-l-8 border-blue-600 shadow-lg hidden">
-                <h3 class="text-blue-600 font-black text-[10px] uppercase mb-2 italic">📘 Criterios Geriátricos (PIM)</h3>
-                <div id="resBeers" class="text-[10px] space-y-3"></div>
             </div>
         </div>
     </main>
@@ -122,14 +126,26 @@
             const fI = document.getElementById('csvInts').files[0];
             if(!fM || !fI) return alert("Seleccione ambos CSV.");
             try {
-                const tM = await fM.text(); const linesM = tM.split(/\r?\n/).filter(l => l.trim() !== "");
-                const txM = db.transaction("meds", "readwrite"); const storeM = txM.objectStore("meds");
-                storeM.clear();
-                linesM.forEach((l, i) => { if(i === 0) return; const p = l.split(',').map(v => v.replace(/"/g, '').trim()); if(p.length >= 3) storeM.put({ atc: p[0].toUpperCase(), dbid: p[1].toUpperCase(), name: p[2].toUpperCase() }); });
-                const tI = await fI.text(); const linesI = tI.split(/\r?\n/).filter(l => l.trim() !== "");
-                const txI = db.transaction("rules", "readwrite"); const storeI = txI.objectStore("rules");
-                storeI.clear();
-                linesI.forEach((l, i) => { if(i === 0) return; const p = l.split(';').map(v => v.replace(/"/g, '').trim()); if(p.length >= 4) { const id = [p[0], p[1]].sort().join('_'); storeI.put({ id, msg: p[2], act: p[3] }); } });
+                const tM = await fM.text();
+                const txM = db.transaction("meds", "readwrite");
+                const storeM = txM.objectStore("meds"); storeM.clear();
+                tM.split(/\r?\n/).forEach((l, i) => {
+                    if(i === 0) return;
+                    const p = l.split(',').map(v => v.replace(/"/g, '').trim());
+                    if(p.length >= 3) storeM.put({ atc: p[0].toUpperCase(), dbid: p[1].toUpperCase(), name: p[2].toUpperCase() });
+                });
+
+                const tI = await fI.text();
+                const txI = db.transaction("rules", "readwrite");
+                const storeI = txI.objectStore("rules"); storeI.clear();
+                tI.split(/\r?\n/).forEach((l, i) => {
+                    if(i === 0) return;
+                    const p = l.split(';').map(v => v.replace(/"/g, '').trim());
+                    if(p.length >= 4) {
+                        const id = [p[0], p[1]].sort().join('_');
+                        storeI.put({ id, msg: p[2], act: p[3] });
+                    }
+                });
                 txI.oncomplete = () => { alert("Sincronización Exitosa."); actualizarEstadoUI(); };
             } catch(e) { alert("Error: " + e.message); }
         }
@@ -137,7 +153,8 @@
         function handleSearch(val) {
             const cont = document.getElementById('sugCont'); if(val.length < 2) { cont.classList.add('hidden'); return; }
             const q = val.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const tx = db.transaction("meds", "readonly"); const store = tx.objectStore("meds");
+            const tx = db.transaction("meds", "readonly");
+            const store = tx.objectStore("meds");
             const req = store.getAll();
             req.onsuccess = () => {
                 const matches = req.result.filter(m => m.name.includes(q)).slice(0, 10);
@@ -164,6 +181,7 @@
             if(confirm("¿Desea limpiar todo?")) { 
                 seleccionados = []; final_dup = []; final_int = []; final_beers = []; flagTriple = false;
                 document.getElementById('pNombre').value = ""; document.getElementById('pEdad').value = "";
+                document.getElementById('farmaInput').value = "";
                 renderLista(); actualizarEstadoUI(); 
                 document.getElementById('resultados').classList.add('hidden'); document.getElementById('btnPdf').classList.add('hidden'); 
             } 
@@ -175,16 +193,13 @@
             document.getElementById('resultados').classList.remove('hidden');
             document.getElementById('btnPdf').classList.remove('hidden');
             
+            // Limpieza UI
             const rD = document.getElementById('resDup'); rD.innerHTML = ""; 
             const rIMaj = document.getElementById('resIntMajor'); rIMaj.innerHTML = "";
             const rIMod = document.getElementById('resIntMod'); rIMod.innerHTML = "";
             const rB = document.getElementById('resBeers'); rB.innerHTML = "";
             const aT = document.getElementById('alertaTriple'); aT.classList.add('hidden');
-            
-            document.getElementById('boxDup').classList.add('hidden');
-            document.getElementById('boxIntMajor').classList.add('hidden');
-            document.getElementById('boxIntMod').classList.add('hidden');
-            document.getElementById('boxBeers').classList.add('hidden');
+            document.querySelectorAll('[id^="box"]').forEach(b => b.classList.add('hidden'));
 
             final_dup = []; final_int = []; final_beers = []; flagTriple = false;
 
@@ -194,7 +209,7 @@
             const mDiur = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.includes("C09BA") || m.atc.includes("C09DA"));
             if(mAine.length && mRaas.length && mDiur.length) {
                 flagTriple = true; tMeds = `AINE: ${mAine.map(m=>m.name).join(', ')} | RAAS: ${mRaas.map(m=>m.name).join(', ')} | DIURÉTICO: ${mDiur.map(m=>m.name).join(', ')}`;
-                aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 ALERTA: TRIPLE WHAMMY DETECTADO<br><span class="text-[8px] font-medium uppercase">${tMeds}</span></div>`; aT.classList.remove('hidden');
+                aT.innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 ALERTA: TRIPLE WHAMMY DETECTADO<br><span class="text-[8px] uppercase">${tMeds}</span></div>`; aT.classList.remove('hidden');
             }
 
             // 2. Duplicidades
@@ -202,8 +217,25 @@
             seleccionados.forEach(m => { let p = m.atc.substring(0,4); if(!grps[p]) grps[p]=[]; grps[p].push(m.name); });
             for(let p in grps) { if(grps[p].length > 1) { final_dup.push({ grp: p, meds: grps[p] }); rD.innerHTML += `<p class="mb-1">• GRUPO ${p}: ${grps[p].join(' + ')}</p>`; document.getElementById('boxDup').classList.remove('hidden'); } }
 
-            // 3. Interacciones DrugBank
+            // 3. Motor de Interacciones y PIM
             const tx = db.transaction("rules", "readonly"); const store = tx.objectStore("rules");
+
+            // Revisión de PIM (Individual)
+            if(edad >= 65) {
+                seleccionados.forEach(m => {
+                    const reqPim = store.get(`${m.dbid}_${m.dbid}`);
+                    reqPim.onsuccess = () => {
+                        const rule = reqPim.result;
+                        if(rule && (rule.msg.toUpperCase().includes("PIM") || rule.msg.toUpperCase().includes("GERIATRI"))) {
+                            final_beers.push({ meds: m.name, desc: rule.msg, act: rule.act });
+                            rB.innerHTML += `<div class="mb-2 border-b pb-1"><b>${m.name}</b><br>${rule.msg}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span></div>`;
+                            document.getElementById('boxBeers').classList.remove('hidden');
+                        }
+                    }
+                });
+            }
+
+            // Revisión de Interacciones (Parejas)
             for (let i = 0; i < seleccionados.length; i++) {
                 for (let j = i + 1; j < seleccionados.length; j++) {
                     const id = [seleccionados[i].dbid, seleccionados[j].dbid].sort().join('_');
@@ -211,14 +243,8 @@
                     req.onsuccess = () => {
                         const rule = req.result;
                         if(rule) {
-                            const msgU = rule.msg.toUpperCase();
-                            const isPim = msgU.includes("PIM") || msgU.includes("GERIATRICO") || msgU.includes("BEERS");
                             const content = `<div class="mb-2 border-b pb-1"><b>${seleccionados[i].name} + ${seleccionados[j].name}</b><br>${rule.msg}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span></div>`;
-                            
-                            if(isPim && edad >= 65) {
-                                final_beers.push({ meds: `${seleccionados[i].name} + ${seleccionados[j].name}`, desc: rule.msg, act: rule.act });
-                                rB.innerHTML += content; document.getElementById('boxBeers').classList.remove('hidden');
-                            } else if(rule.act.includes("EVITAR")) {
+                            if(rule.act.includes("EVITAR")) {
                                 final_int.push({ meds: `${seleccionados[i].name} + ${seleccionados[j].name}`, desc: rule.msg, act: rule.act, type: "GRAVE" });
                                 rIMaj.innerHTML += content; document.getElementById('boxIntMajor').classList.remove('hidden');
                             } else {
@@ -236,46 +262,60 @@
                 const { jsPDF } = window.jspdf; const doc = new jsPDF({ format: 'letter' });
                 const pW = doc.internal.pageSize.getWidth(); const pH = doc.internal.pageSize.getHeight();
                 let pac = (document.getElementById('pNombre').value || "ANÓNIMO").toUpperCase();
-                const legal = "Aviso: Esta herramienta es un apoyo a la decisión clínica. Los resultados deben ser validados por el médico tratante.";
+                const legal = "Aviso de Advertencia: Esta aplicación es una herramienta de apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.";
 
-                // Encabezado
+                // Encabezado Profesional
                 doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 40, 'F');
                 doc.setTextColor(16, 185, 129); doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("VIGILANCIA FARMACOLOGICA", 15, 20);
                 doc.setTextColor(255); doc.setFontSize(9); doc.text(`Paciente: ${pac} | Edad: ${document.getElementById('pEdad').value || "--"} años | Fecha: ${new Date().toLocaleDateString()}`, 15, 32);
                 
-                // RESUMEN DE HALLAZGOS
+                // CUADRO DE RESUMEN DE HALLAZGOS (Mejorado)
                 let curY = 45;
-                doc.setFillColor(241, 245, 249); doc.rect(15, curY, pW - 30, 25, 'F');
-                doc.setTextColor(30, 41, 59); doc.setFontSize(10); doc.text("RESUMEN DE HALLAZGOS", 20, curY + 7);
-                doc.setFontSize(8); doc.text(`Fármacos: ${seleccionados.length} | Graves: ${final_int.filter(i=>i.type==="GRAVE").length} | Moderadas: ${final_int.filter(i=>i.type==="MODERADA").length} | PIM: ${final_beers.length}`, 20, curY + 16);
+                doc.setFillColor(241, 245, 249); doc.rect(15, curY, pW - 30, 30, 'F');
+                doc.setDrawColor(203, 213, 225); doc.rect(15, curY, pW - 30, 30);
+                
+                doc.setTextColor(30, 41, 59); doc.setFontSize(10); doc.text("RESUMEN ESTRATÉGICO DE HALLAZGOS", 20, curY + 8);
+                doc.setFontSize(8); doc.setFont("helvetica", "normal");
+                const col1 = 20, col2 = 80, col3 = 140;
+                doc.text(`• Total Fármacos: ${seleccionados.length}`, col1, curY + 16);
+                doc.text(`• Interacciones Graves: ${final_int.filter(i=>i.type==="GRAVE").length}`, col1, curY + 23);
+                doc.text(`• Interacciones Moderadas: ${final_int.filter(i=>i.type==="MODERADA").length}`, col2, curY + 16);
+                doc.text(`• Duplicidad Terapéutica: ${final_dup.length}`, col2, curY + 23);
+                doc.text(`• Alerta Triple Whammy: ${flagTriple ? 'SÍ' : 'NO'}`, col3, curY + 16);
+                doc.text(`• Criterios Beers (PIM): ${final_beers.length}`, col3, curY + 23);
 
-                // Lista de Fármacos
-                doc.autoTable({ startY: curY + 30, head: [['FARMACO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 8 } });
+                // Listado de Medicamentos
+                doc.autoTable({ startY: curY + 35, head: [['FARMACO', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 7 } });
                 curY = doc.lastAutoTable.finalY + 15;
 
+                // Secciones de Alertas con Validación de Espacio
                 const secciones = [
                     { t: "ALERTA: TRIPLE WHAMMY", d: flagTriple ? [{m: tMeds, a: "EVITAR"}] : [], c: [185, 28, 28] },
                     { t: "DUPLICIDAD TERAPEUTICA", d: final_dup.map(d=>({m: d.meds.join(' + '), a: `Grupo ${d.grp}`})), c: [217, 119, 6] },
+                    { t: "CRITERIOS GERIATRICOS (PIM)", d: final_beers.map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [37, 99, 235] },
                     { t: "INTERACCIONES GRAVES", d: final_int.filter(i=>i.type==="GRAVE").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [185, 28, 28] },
-                    { t: "INTERACCIONES MODERADAS", d: final_int.filter(i=>i.type==="MODERADA").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [202, 138, 4] },
-                    { t: "CRITERIOS GERIATRICOS (PIM)", d: final_beers.map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [37, 99, 235] }
+                    { t: "INTERACCIONES MODERADAS", d: final_int.filter(i=>i.type==="MODERADA").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [202, 138, 4] }
                 ];
 
                 secciones.forEach(s => {
                     if(s.d.length > 0) {
+                        // Si hay menos de 50px libres, saltar página antes del título
                         if (curY > pH - 50) { doc.addPage(); curY = 20; }
                         doc.setFontSize(11); doc.setTextColor(s.c[0], s.c[1], s.c[2]); doc.text(s.t, 15, curY);
-                        doc.autoTable({ startY: curY + 5, head: [['DESCRIPCION', 'ACCION']], body: s.d.map(i => [i.m, i.a]), headStyles: {fillColor: s.c}, styles: {fontSize: 7} });
+                        doc.autoTable({ startY: curY + 5, head: [['DESCRIPCIÓN DE LA ALERTA', 'ACCIÓN']], body: s.d.map(i => [i.m, i.a]), headStyles: {fillColor: s.c}, styles: {fontSize: 7}, margin: { bottom: 35 } });
                         curY = doc.lastAutoTable.finalY + 15;
                     }
                 });
 
-                // Paginación y Legal
+                // Paginación y Disclaimer (Pie de página)
                 const totalPages = doc.internal.getNumberOfPages();
                 for (let i = 1; i <= totalPages; i++) {
-                    doc.setPage(i); doc.setFontSize(7); doc.setTextColor(120);
-                    doc.text(legal, 15, pH - 15, { maxWidth: pW - 30 });
-                    doc.text(`Página ${i} de ${totalPages}`, pW - 30, pH - 10, { align: "right" });
+                    doc.setPage(i);
+                    doc.setFontSize(7); doc.setTextColor(100);
+                    // Linea divisoria superior al footer
+                    doc.setDrawColor(220); doc.line(15, pH - 28, pW - 15, pH - 28);
+                    doc.text(legal, 15, pH - 22, { maxWidth: pW - 30 });
+                    doc.text(`Página ${i} de ${totalPages}`, pW - 15, pH - 10, { align: "right" });
                 }
                 doc.save(`Vigilancia_${pac}.pdf`);
             } catch(e) { alert("Error PDF: " + e.message); }
