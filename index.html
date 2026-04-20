@@ -199,6 +199,7 @@
             final_dup = []; final_int = []; final_beers = []; flagTriple = false;
             let intDetectadas = new Set(); 
 
+            // Triple Whammy
             const mAine = seleccionados.filter(m => m.atc.startsWith("M01A"));
             const mRaas = seleccionados.filter(m => m.atc.startsWith("C09"));
             const mDiur = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.includes("C09BA") || m.atc.includes("C09DA"));
@@ -208,12 +209,14 @@
                 document.getElementById('alertaTriple').classList.remove('hidden');
             }
 
+            // Grupos para duplicidad
             let grps = {};
             seleccionados.forEach(m => { let p = m.atc.substring(0,4); if(!grps[p]) grps[p]=[]; grps[p].push(m.name); });
             for(let p in grps) { if(grps[p].length > 1) { final_dup.push({ grp: p, meds: grps[p] }); rD.innerHTML += `<p class="mb-1">• GRUPO ${p}: ${grps[p].join(' + ')}</p>`; document.getElementById('boxDup').classList.remove('hidden'); } }
 
             const tx = db.transaction("rules", "readonly"); const store = tx.objectStore("rules");
 
+            // Motor de PIM (Con filtro de DUALIDAD)
             seleccionados.forEach(m => {
                 const variaciones = [m.atc, m.atc.substring(0,5), m.atc.substring(0,4)];
                 variaciones.forEach(c => {
@@ -221,9 +224,18 @@
                     rPim.onsuccess = () => {
                         const rule = rPim.result;
                         if(rule && edad >= 65 && rule.msg.toUpperCase().includes("PIM")) {
+                            const msgU = rule.msg.toUpperCase();
+                            // REGLA CLAVE: Si es alerta DUAL, verificar que haya más de 1 fármaco del grupo
+                            if(msgU.includes("DUAL") && grps[c] && grps[c].length < 2) return;
+
                             if(!final_beers.some(b => b.desc === rule.msg && b.meds === m.name)) {
-                                final_beers.push({ meds: m.name, desc: rule.msg, act: rule.act });
-                                rB.innerHTML += `<div class="mb-2 border-b pb-1">${rule.msg}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span></div>`;
+                                // Sustitución de nombre en mensaje PIM
+                                let cleanMsg = rule.msg.includes(':') ? rule.msg.split(':').slice(1).join(':').trim() : rule.msg;
+                                // Si el mensaje limpio empieza con el nombre del fármaco en la DB, lo quitamos
+                                if(cleanMsg.toUpperCase().startsWith(m.name)) cleanMsg = cleanMsg.substring(m.name.length).trim();
+                                
+                                final_beers.push({ meds: m.name, desc: cleanMsg, act: rule.act });
+                                rB.innerHTML += `<div class="mb-2 border-b pb-1"><b>${m.name}</b>: ${cleanMsg}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span></div>`;
                                 document.getElementById('boxBeers').classList.remove('hidden');
                             }
                         }
@@ -231,6 +243,7 @@
                 });
             });
 
+            // Motor de Interacciones (Con Sustitución de Nombres)
             for (let i = 0; i < seleccionados.length; i++) {
                 for (let j = i + 1; j < seleccionados.length; j++) {
                     const id = [seleccionados[i].dbid, seleccionados[j].dbid].sort().join('_');
@@ -240,12 +253,18 @@
                         const rule = req.result;
                         if(rule && seleccionados[i].dbid !== seleccionados[j].dbid) {
                             intDetectadas.add(id);
-                            const content = `<div class="mb-2 border-b pb-1">${rule.msg}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span></div>`;
+                            // RECORTE DINÁMICO: Quitamos el encabezado "Fármaco A + Fármaco B:" de la base de datos
+                            const rawMsg = rule.msg;
+                            const clinicalDesc = rawMsg.includes(':') ? rawMsg.split(':').slice(1).join(':').trim() : rawMsg;
+                            
+                            const pairNames = `${seleccionados[i].name} + ${seleccionados[j].name}`;
+                            const content = `<div class="mb-2 border-b pb-1"><b>${pairNames}</b>: ${clinicalDesc}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span></div>`;
+                            
                             if(rule.act.toUpperCase().includes("EVITAR")) {
-                                final_int.push({ meds: `${seleccionados[i].name} + ${seleccionados[j].name}`, desc: rule.msg, act: rule.act, type: "GRAVE" });
+                                final_int.push({ meds: pairNames, desc: clinicalDesc, act: rule.act, type: "GRAVE" });
                                 rIMaj.innerHTML += content; document.getElementById('boxIntMajor').classList.remove('hidden');
                             } else {
-                                final_int.push({ meds: `${seleccionados[i].name} + ${seleccionados[j].name}`, desc: rule.msg, act: rule.act, type: "MODERADA" });
+                                final_int.push({ meds: pairNames, desc: clinicalDesc, act: rule.act, type: "MODERADA" });
                                 rIMod.innerHTML += content; document.getElementById('boxIntMod').classList.remove('hidden');
                             }
                         }
@@ -288,8 +307,8 @@
                 const secciones = [
                     { t: "ALERTA: TRIPLE WHAMMY", d: flagTriple ? [{m: tMeds, a: "EVITAR"}] : [], c: [185, 28, 28] },
                     { t: "DUPLICIDAD TERAPEUTICA", d: final_dup.map(d=>({m: d.meds.join(' + '), a: `Grupo ${d.grp}`})), c: [217, 119, 6] },
-                    { t: "CRITERIOS GERIATRICOS (PIM)", d: final_beers.map(i=>({m: i.desc, a: i.act})), c: [37, 99, 235] },
-                    { t: "INTERACCIONES GRAVES", d: final_int.filter(i=>i.type==="GRAVE").map(i=>({m: i.desc, a: i.act})), c: [185, 28, 28] },
+                    { t: "CRITERIOS GERIATRICOS (PIM)", d: final_beers.map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [37, 99, 235] },
+                    { t: "INTERACCIONES GRAVES", d: final_int.filter(i=>i.type==="GRAVE").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [185, 28, 28] },
                     { t: "INTERACCIONES MODERADAS", d: final_int.filter(i=>i.type==="MODERADA").map(i=>({m: i.desc, a: i.act})), c: [202, 138, 4] }
                 ];
 
