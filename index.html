@@ -29,7 +29,7 @@
             </div>
             <div class="p-8 space-y-4 text-justify text-[11.5px] text-slate-800 font-medium">
                 <p class="font-black text-red-600 text-center uppercase border-b pb-2">Aviso de Advertencia</p>
-                <p>Esta aplicación es una herramienta de apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.</p>
+                <p>Esta aplicación es una herramienta de apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio profesional. La información no sustituye la consulta médica ni el criterio del especialista.</p>
                 <button onclick="document.getElementById('welcomeScreen').style.display='none'" class="w-full bg-slate-800 text-emerald-400 py-5 rounded-2xl font-black text-sm uppercase shadow-xl transition-all">ACEPTAR</button>
             </div>
         </div>
@@ -84,6 +84,10 @@
             <div id="boxIntMod" class="bg-white rounded-3xl p-5 border-l-8 border-yellow-500 shadow-lg hidden">
                 <h3 class="text-yellow-600 font-black text-[10px] uppercase mb-2 italic">⚠️ Interacciones Moderadas</h3>
                 <div id="resIntMod" class="text-[10px] space-y-3"></div>
+            </div>
+            <div id="boxIntMinor" class="bg-white rounded-3xl p-5 border-l-8 border-emerald-500 shadow-lg hidden">
+                <h3 class="text-emerald-600 font-black text-[10px] uppercase mb-2 italic">ℹ️ Interacciones Leves</h3>
+                <div id="resIntMinor" class="text-[10px] space-y-3"></div>
             </div>
         </div>
     </main>
@@ -193,6 +197,7 @@
             const rD = document.getElementById('resDup'); rD.innerHTML = ""; 
             const rIMaj = document.getElementById('resIntMajor'); rIMaj.innerHTML = "";
             const rIMod = document.getElementById('resIntMod'); rIMod.innerHTML = "";
+            const rIMin = document.getElementById('resIntMinor'); rIMin.innerHTML = "";
             const rB = document.getElementById('resBeers'); rB.innerHTML = "";
             document.getElementById('alertaTriple').classList.add('hidden');
 
@@ -209,14 +214,13 @@
                 document.getElementById('alertaTriple').classList.remove('hidden');
             }
 
-            // Grupos para duplicidad
             let grps = {};
             seleccionados.forEach(m => { let p = m.atc.substring(0,4); if(!grps[p]) grps[p]=[]; grps[p].push(m.name); });
             for(let p in grps) { if(grps[p].length > 1) { final_dup.push({ grp: p, meds: grps[p] }); rD.innerHTML += `<p class="mb-1">• GRUPO ${p}: ${grps[p].join(' + ')}</p>`; document.getElementById('boxDup').classList.remove('hidden'); } }
 
             const tx = db.transaction("rules", "readonly"); const store = tx.objectStore("rules");
 
-            // Motor de PIM (Con filtro de DUALIDAD)
+            // Motor PIM
             seleccionados.forEach(m => {
                 const variaciones = [m.atc, m.atc.substring(0,5), m.atc.substring(0,4)];
                 variaciones.forEach(c => {
@@ -225,15 +229,10 @@
                         const rule = rPim.result;
                         if(rule && edad >= 65 && rule.msg.toUpperCase().includes("PIM")) {
                             const msgU = rule.msg.toUpperCase();
-                            // REGLA CLAVE: Si es alerta DUAL, verificar que haya más de 1 fármaco del grupo
                             if(msgU.includes("DUAL") && grps[c] && grps[c].length < 2) return;
-
                             if(!final_beers.some(b => b.desc === rule.msg && b.meds === m.name)) {
-                                // Sustitución de nombre en mensaje PIM
                                 let cleanMsg = rule.msg.includes(':') ? rule.msg.split(':').slice(1).join(':').trim() : rule.msg;
-                                // Si el mensaje limpio empieza con el nombre del fármaco en la DB, lo quitamos
                                 if(cleanMsg.toUpperCase().startsWith(m.name)) cleanMsg = cleanMsg.substring(m.name.length).trim();
-                                
                                 final_beers.push({ meds: m.name, desc: cleanMsg, act: rule.act });
                                 rB.innerHTML += `<div class="mb-2 border-b pb-1"><b>${m.name}</b>: ${cleanMsg}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span></div>`;
                                 document.getElementById('boxBeers').classList.remove('hidden');
@@ -243,7 +242,7 @@
                 });
             });
 
-            // Motor de Interacciones (Con Sustitución de Nombres)
+            // Motor Interacciones (Grave, Moderada, Leve)
             for (let i = 0; i < seleccionados.length; i++) {
                 for (let j = i + 1; j < seleccionados.length; j++) {
                     const id = [seleccionados[i].dbid, seleccionados[j].dbid].sort().join('_');
@@ -253,19 +252,20 @@
                         const rule = req.result;
                         if(rule && seleccionados[i].dbid !== seleccionados[j].dbid) {
                             intDetectadas.add(id);
-                            // RECORTE DINÁMICO: Quitamos el encabezado "Fármaco A + Fármaco B:" de la base de datos
-                            const rawMsg = rule.msg;
-                            const clinicalDesc = rawMsg.includes(':') ? rawMsg.split(':').slice(1).join(':').trim() : rawMsg;
-                            
+                            const clinicalDesc = rule.msg.includes(':') ? rule.msg.split(':').slice(1).join(':').trim() : rule.msg;
                             const pairNames = `${seleccionados[i].name} + ${seleccionados[j].name}`;
                             const content = `<div class="mb-2 border-b pb-1"><b>${pairNames}</b>: ${clinicalDesc}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span></div>`;
                             
-                            if(rule.act.toUpperCase().includes("EVITAR")) {
+                            const actU = rule.act.toUpperCase();
+                            if(actU.includes("EVITAR") || rule.msg.toUpperCase().includes("GRAVE")) {
                                 final_int.push({ meds: pairNames, desc: clinicalDesc, act: rule.act, type: "GRAVE" });
                                 rIMaj.innerHTML += content; document.getElementById('boxIntMajor').classList.remove('hidden');
-                            } else {
+                            } else if(actU.includes("MONITOREO") || rule.msg.toUpperCase().includes("MODERADO")) {
                                 final_int.push({ meds: pairNames, desc: clinicalDesc, act: rule.act, type: "MODERADA" });
                                 rIMod.innerHTML += content; document.getElementById('boxIntMod').classList.remove('hidden');
+                            } else {
+                                final_int.push({ meds: pairNames, desc: clinicalDesc, act: rule.act, type: "LEVE" });
+                                rIMin.innerHTML += content; document.getElementById('boxIntMinor').classList.remove('hidden');
                             }
                         }
                     };
@@ -292,12 +292,13 @@
                         ['FÁRMACOS EN PRESCRIPCIÓN', seleccionados.length],
                         ['INTERACCIONES GRAVES', final_int.filter(i=>i.type==="GRAVE").length],
                         ['INTERACCIONES MODERADAS', final_int.filter(i=>i.type==="MODERADA").length],
+                        ['INTERACCIONES LEVES', final_int.filter(i=>i.type==="LEVE").length],
                         ['DUPLICIDAD TERAPÉUTICA', final_dup.length],
                         ['ALERTA TRIPLE WHAMMY', flagTriple ? 'SÍ DETECTADA' : 'NO'],
                         ['CRITERIOS BEERS (PIM)', final_beers.length]
                     ],
                     theme: 'grid', styles: { fontSize: 8, cellPadding: 2 },
-                    headStyles: { fillColor: [30, 41, 59] }, columnStyles: { 0: { fontStyle: 'bold', width: 70 } }
+                    headStyles: { fillColor: [30, 41, 59] }, columnStyles: { 0: { fontStyle: 'bold', width: 75 } }
                 });
 
                 curY = doc.lastAutoTable.finalY + 10;
@@ -309,7 +310,8 @@
                     { t: "DUPLICIDAD TERAPEUTICA", d: final_dup.map(d=>({m: d.meds.join(' + '), a: `Grupo ${d.grp}`})), c: [217, 119, 6] },
                     { t: "CRITERIOS GERIATRICOS (PIM)", d: final_beers.map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [37, 99, 235] },
                     { t: "INTERACCIONES GRAVES", d: final_int.filter(i=>i.type==="GRAVE").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [185, 28, 28] },
-                    { t: "INTERACCIONES MODERADAS", d: final_int.filter(i=>i.type==="MODERADA").map(i=>({m: i.desc, a: i.act})), c: [202, 138, 4] }
+                    { t: "INTERACCIONES MODERADAS", d: final_int.filter(i=>i.type==="MODERADA").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [202, 138, 4] },
+                    { t: "INTERACCIONES LEVES", d: final_int.filter(i=>i.type==="LEVE").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [16, 185, 129] }
                 ];
 
                 secciones.forEach(s => {
