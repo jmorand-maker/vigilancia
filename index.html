@@ -223,9 +223,10 @@
 
             const tx = db.transaction("rules", "readonly"); const store = tx.objectStore("rules");
 
-            // Motor de PIM (Con filtro de DUALIDAD e Identidad de fármaco)
+            // Motor de PIM con FILTRO DE UNICIDAD para evitar repeticiones (Caso Meloxicam)
             seleccionados.forEach(m => {
-                const variaciones = [m.atc, m.atc.substring(0,5), m.atc.substring(0,4)];
+                // Filtramos variaciones únicas para que códigos cortos (ej. M01A) no repitan la búsqueda
+                const variaciones = [...new Set([m.atc, m.atc.substring(0,5), m.atc.substring(0,4)])];
                 variaciones.forEach(c => {
                     const rPim = store.get(`${c}_${c}`);
                     rPim.onsuccess = () => {
@@ -245,7 +246,6 @@
                 });
             });
 
-            // Motor de Interacciones (Control A+B/B+A y Sustitución de Nombres)
             for (let i = 0; i < seleccionados.length; i++) {
                 for (let j = i + 1; j < seleccionados.length; j++) {
                     const id = [seleccionados[i].dbid, seleccionados[j].dbid].sort().join('_');
@@ -329,7 +329,6 @@
                     }
                 });
 
-                // ESPACIO PARA FIRMA AL FINAL
                 if (curY > pH - 40) { doc.addPage(); curY = 30; } else { curY += 10; }
                 doc.setDrawColor(30, 41, 59); doc.line(pW/2 - 40, curY + 15, pW/2 + 40, curY + 15);
                 doc.setTextColor(30, 41, 59); doc.setFontSize(8); doc.text("FIRMA DEL RESPONSABLE", pW/2, curY + 20, { align: "center" });
