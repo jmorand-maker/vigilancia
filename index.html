@@ -51,9 +51,12 @@
         </section>
 
         <section class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
-            <div class="flex gap-2">
-                <div class="flex-1"><label>Nombre del Paciente</label><input type="text" id="pNombre" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="EJ. JUAN PÉREZ"></div>
-                <div class="w-24"><label>Edad</label><input type="number" id="pEdad" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black outline-none" placeholder="AÑOS"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label>Nombre del Paciente (Alias o Iniciales)</label><input type="text" id="pNombre" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="EJ. J.P. O PACIENTE 101"></div>
+                <div class="flex gap-2">
+                    <div class="flex-1"><label>Edad</label><input type="number" id="pEdad" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black outline-none" placeholder="AÑOS"></div>
+                    <div class="flex-1"><label>Responsable</label><input type="text" id="pResp" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="FARMACÉUTICO"></div>
+                </div>
             </div>
         </section>
 
@@ -181,7 +184,7 @@
             if(confirm("¿Desea limpiar todo?")) { 
                 seleccionados = []; final_dup = []; final_int = []; final_beers = []; flagTriple = false;
                 document.getElementById('pNombre').value = ""; document.getElementById('pEdad').value = "";
-                document.getElementById('farmaInput').value = "";
+                document.getElementById('pResp').value = ""; document.getElementById('farmaInput').value = "";
                 renderLista(); actualizarEstadoUI(); 
                 document.getElementById('resultados').classList.add('hidden'); document.getElementById('btnPdf').classList.add('hidden'); 
             } 
@@ -220,7 +223,7 @@
 
             const tx = db.transaction("rules", "readonly"); const store = tx.objectStore("rules");
 
-            // Motor PIM
+            // Motor de PIM (Con filtro de DUALIDAD e Identidad de fármaco)
             seleccionados.forEach(m => {
                 const variaciones = [m.atc, m.atc.substring(0,5), m.atc.substring(0,4)];
                 variaciones.forEach(c => {
@@ -242,7 +245,7 @@
                 });
             });
 
-            // Motor Interacciones (Grave, Moderada, Leve)
+            // Motor de Interacciones (Control A+B/B+A y Sustitución de Nombres)
             for (let i = 0; i < seleccionados.length; i++) {
                 for (let j = i + 1; j < seleccionados.length; j++) {
                     const id = [seleccionados[i].dbid, seleccionados[j].dbid].sort().join('_');
@@ -278,11 +281,14 @@
                 const { jsPDF } = window.jspdf; const doc = new jsPDF({ format: 'letter' });
                 const pW = doc.internal.pageSize.getWidth(); const pH = doc.internal.pageSize.getHeight();
                 let pac = (document.getElementById('pNombre').value || "ANÓNIMO").toUpperCase();
+                let resp = (document.getElementById('pResp').value || "NO ASIGNADO").toUpperCase();
                 const legal = "Aviso: Esta herramienta es un apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.";
 
                 doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 40, 'F');
                 doc.setTextColor(16, 185, 129); doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("VIGILANCIA FARMACOLOGICA", 15, 20);
-                doc.setTextColor(255); doc.setFontSize(9); doc.text(`Paciente: ${pac} | Edad: ${document.getElementById('pEdad').value || "--"} años | Fecha: ${new Date().toLocaleDateString()}`, 15, 32);
+                doc.setTextColor(255); doc.setFontSize(8); 
+                doc.text(`Paciente: ${pac} | Edad: ${document.getElementById('pEdad').value || "--"} años | Fecha: ${new Date().toLocaleDateString()}`, 15, 30);
+                doc.text(`Responsable: ${resp}`, 15, 35);
                 
                 let curY = 45;
                 doc.autoTable({
@@ -316,16 +322,21 @@
 
                 secciones.forEach(s => {
                     if(s.d.length > 0) {
-                        if (curY > pH - 65) { doc.addPage(); curY = 20; }
-                        doc.setFontSize(11); doc.setTextColor(s.c[0], s.c[1], s.c[2]); doc.text(s.t, 15, curY);
-                        doc.autoTable({ startY: curY + 5, head: [['DESCRIPCIÓN', 'ACCIÓN']], body: s.d.map(i => [i.m, i.a]), headStyles: {fillColor: s.c}, styles: {fontSize: 7}, margin: { bottom: 45 } });
-                        curY = doc.lastAutoTable.finalY + 15;
+                        if (curY > pH - 70) { doc.addPage(); curY = 20; }
+                        doc.setFontSize(10); doc.setTextColor(s.c[0], s.c[1], s.c[2]); doc.text(s.t, 15, curY);
+                        doc.autoTable({ startY: curY + 4, head: [['DESCRIPCIÓN', 'ACCIÓN']], body: s.d.map(i => [i.m, i.a]), headStyles: {fillColor: s.c}, styles: {fontSize: 7}, margin: { bottom: 45 } });
+                        curY = doc.lastAutoTable.finalY + 12;
                     }
                 });
 
+                // ESPACIO PARA FIRMA AL FINAL
+                if (curY > pH - 40) { doc.addPage(); curY = 30; } else { curY += 10; }
+                doc.setDrawColor(30, 41, 59); doc.line(pW/2 - 40, curY + 15, pW/2 + 40, curY + 15);
+                doc.setTextColor(30, 41, 59); doc.setFontSize(8); doc.text("FIRMA DEL RESPONSABLE", pW/2, curY + 20, { align: "center" });
+
                 const totalPages = doc.internal.getNumberOfPages();
                 for (let i = 1; i <= totalPages; i++) {
-                    doc.setPage(i); doc.setFontSize(7); doc.setTextColor(100);
+                    doc.setPage(i); doc.setFontSize(6); doc.setTextColor(100);
                     doc.setDrawColor(220); doc.line(15, pH - 35, pW - 15, pH - 35);
                     doc.text(legal, 15, pH - 28, { maxWidth: pW - 40 });
                     doc.text(`Página ${i} de ${totalPages}`, pW - 20, pH - 15, { align: "right" });
