@@ -17,7 +17,7 @@
         .badge-count { background: #1e293b; color: #10b981; padding: 2px 12px; border-radius: 999px; font-size: 12px; font-weight: 900; margin-left: 8px; }
         #farmaInput { border: 3px solid #10b981; background-color: #f8fafc; font-weight: 800; }
         label { font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .info-btn { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: #3b82f6; color: white; border-radius: 4px; font-size: 10px; margin-left: 6px; cursor: pointer; }
+        .info-btn { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: #3b82f6; color: white; border-radius: 4px; font-size: 10px; margin-left: 6px; cursor: pointer; text-decoration: none; }
     </style>
 </head>
 <body class="min-h-screen pb-32">
@@ -53,10 +53,10 @@
 
         <section class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label>Nombre del Paciente (Alias o Iniciales)</label><input type="text" id="pNombre" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="EJ. J.P. O PACIENTE 101"></div>
+                <div><label>Paciente (Alias/Iniciales)</label><input type="text" id="pNombre" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="EJ. J.P."></div>
                 <div class="flex gap-2">
                     <div class="flex-1"><label>Edad</label><input type="number" id="pEdad" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black outline-none" placeholder="AÑOS"></div>
-                    <div class="flex-1"><label>Responsable</label><input type="text" id="pResp" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="FARMACÉUTICO"></div>
+                    <div class="flex-1"><label>Responsable</label><input type="text" id="pResp" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="NOMBRE"></div>
                 </div>
             </div>
         </section>
@@ -147,7 +147,9 @@
                     const p = l.split(';').map(v => v.replace(/"/g, '').trim());
                     if(p.length >= 4) {
                         const id = [p[0], p[1]].sort().join('_');
-                        storeI.put({ id, msg: p[2], act: p[3] });
+                        // LIMPIEZA DE COMAS FINALES EN ACCIÓN
+                        const actClean = p[3].replace(/,+$/, '').trim();
+                        storeI.put({ id, msg: p[2], act: actClean });
                     }
                 });
                 txI.oncomplete = () => { alert("Sincronización Exitosa."); actualizarEstadoUI(); };
@@ -208,6 +210,7 @@
             final_dup = []; final_int = []; final_beers = []; flagTriple = false;
             let intDetectadas = new Set(); 
 
+            // 1. Triple Whammy
             const mAine = seleccionados.filter(m => m.atc.startsWith("M01A"));
             const mRaas = seleccionados.filter(m => m.atc.startsWith("C09"));
             const mDiur = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.includes("C09BA") || m.atc.includes("C09DA"));
@@ -223,28 +226,35 @@
 
             const tx = db.transaction("rules", "readonly"); const store = tx.objectStore("rules");
 
-            seleccionados.forEach(m => {
-                const variaciones = [...new Set([m.atc, m.atc.substring(0,5), m.atc.substring(0,4)])];
-                variaciones.forEach(c => {
-                    const rPim = store.get(`${c}_${c}`);
-                    rPim.onsuccess = () => {
-                        const rule = rPim.result;
-                        if(rule && edad >= 65 && rule.msg.toUpperCase().includes("PIM")) {
-                            const msgU = rule.msg.toUpperCase();
-                            if(msgU.includes("DUAL") && grps[c] && grps[c].length < 2) return;
-                            if(!final_beers.some(b => b.desc === rule.msg && b.meds === m.name)) {
-                                let cleanMsg = rule.msg.includes(':') ? rule.msg.split(':').slice(1).join(':').trim() : rule.msg;
-                                if(cleanMsg.toUpperCase().startsWith(m.name)) cleanMsg = cleanMsg.substring(m.name.length).trim();
-                                final_beers.push({ meds: m.name, desc: cleanMsg, act: rule.act });
-                                const qUrl = `https://www.google.com/search?q=${encodeURIComponent(m.name + " " + cleanMsg)}`;
-                                rB.innerHTML += `<div class="mb-2 border-b pb-1"><b>${m.name}</b>: ${cleanMsg}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span><a href="${qUrl}" target="_blank" class="info-btn">ℹ️</a></div>`;
-                                document.getElementById('boxBeers').classList.remove('hidden');
-                            }
-                        }
+            // 2. Motor PIM (Jerárquico para evitar duplicados como Gabapentina)
+            for (const m of seleccionados) {
+                if (edad < 65) break;
+                // Intentar encontrar la regla de mayor a menor longitud del ATC
+                const variaciones = [m.atc, m.atc.substring(0,5), m.atc.substring(0,4)];
+                for (const c of variaciones) {
+                    const rule = await new Promise(resolve => {
+                        const req = store.get(`${c}_${c}`);
+                        req.onsuccess = () => resolve(req.result);
+                    });
+                    
+                    if (rule && rule.msg.toUpperCase().includes("PIM")) {
+                        const msgU = rule.msg.toUpperCase();
+                        if (msgU.includes("DUAL") && grps[c] && grps[c].length < 2) continue;
+                        
+                        let cleanMsg = rule.msg.includes(':') ? rule.msg.split(':').slice(1).join(':').trim() : rule.msg;
+                        if(cleanMsg.toUpperCase().startsWith(m.name)) cleanMsg = cleanMsg.substring(m.name.length).trim();
+                        
+                        final_beers.push({ meds: m.name, desc: cleanMsg, act: rule.act });
+                        const qUrl = `https://www.google.com/search?q=${encodeURIComponent(m.name + " " + cleanMsg)}`;
+                        rB.innerHTML += `<div class="mb-2 border-b pb-1"><b>${m.name}</b>: ${cleanMsg}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span><a href="${qUrl}" target="_blank" class="info-btn">ℹ️</a></div>`;
+                        document.getElementById('boxBeers').classList.remove('hidden');
+                        // DETENERSE EN LA PRIMERA COINCIDENCIA (La más específica)
+                        break; 
                     }
-                });
-            });
+                }
+            }
 
+            // 3. Motor Interacciones
             for (let i = 0; i < seleccionados.length; i++) {
                 for (let j = i + 1; j < seleccionados.length; j++) {
                     const id = [seleccionados[i].dbid, seleccionados[j].dbid].sort().join('_');
@@ -281,7 +291,7 @@
                 const { jsPDF } = window.jspdf; const doc = new jsPDF({ format: 'letter' });
                 const pW = doc.internal.pageSize.getWidth(); const pH = doc.internal.pageSize.getHeight();
                 let pac = (document.getElementById('pNombre').value || "ANÓNIMO").toUpperCase();
-                let resp = (document.getElementById('pResp').value || "NO ASIGNADO").toUpperCase();
+                let resp = (document.getElementById('pResp').value || "FARMACÉUTICO").toUpperCase();
                 const legal = "Aviso: Esta herramienta es un apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.";
 
                 doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 40, 'F');
@@ -314,10 +324,10 @@
                 const secciones = [
                     { t: "ALERTA: TRIPLE WHAMMY", d: flagTriple ? [{m: tMeds, a: "EVITAR"}] : [], c: [185, 28, 28] },
                     { t: "DUPLICIDAD TERAPEUTICA", d: final_dup.map(d=>({m: d.meds.join(' + '), a: `Grupo ${d.grp}`})), c: [217, 119, 6] },
-                    { t: "CRITERIOS GERIATRICOS (PIM)", d: final_beers.map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [37, 99, 235] },
-                    { t: "INTERACCIONES GRAVES", d: final_int.filter(i=>i.type==="GRAVE").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [185, 28, 28] },
-                    { t: "INTERACCIONES MODERADAS", d: final_int.filter(i=>i.type==="MODERADA").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [202, 138, 4] },
-                    { t: "INTERACCIONES LEVES", d: final_int.filter(i=>i.type==="LEVE").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [16, 185, 129] }
+                    { t: "CRITERIOS GERIATRICOS (PIM)", d: final_beers.map(i=>({m: i.desc, a: i.act})), c: [37, 99, 235] },
+                    { t: "INTERACCIONES GRAVES", d: final_int.filter(i=>i.type==="GRAVE").map(i=>({m: i.desc, a: i.act})), c: [185, 28, 28] },
+                    { t: "INTERACCIONES MODERADAS", d: final_int.filter(i=>i.type==="MODERADA").map(i=>({m: i.desc, a: i.act})), c: [202, 138, 4] },
+                    { t: "INTERACCIONES LEVES", d: final_int.filter(i=>i.type==="LEVE").map(i=>({m: i.desc, a: i.act})), c: [16, 185, 129] }
                 ];
 
                 secciones.forEach(s => {
