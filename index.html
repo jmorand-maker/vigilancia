@@ -17,6 +17,7 @@
         .badge-count { background: #1e293b; color: #10b981; padding: 2px 12px; border-radius: 999px; font-size: 12px; font-weight: 900; margin-left: 8px; }
         #farmaInput { border: 3px solid #10b981; background-color: #f8fafc; font-weight: 800; }
         label { font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .info-btn { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: #3b82f6; color: white; border-radius: 4px; font-size: 10px; margin-left: 6px; cursor: pointer; }
     </style>
 </head>
 <body class="min-h-screen pb-32">
@@ -207,7 +208,6 @@
             final_dup = []; final_int = []; final_beers = []; flagTriple = false;
             let intDetectadas = new Set(); 
 
-            // Triple Whammy
             const mAine = seleccionados.filter(m => m.atc.startsWith("M01A"));
             const mRaas = seleccionados.filter(m => m.atc.startsWith("C09"));
             const mDiur = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.includes("C09BA") || m.atc.includes("C09DA"));
@@ -223,9 +223,7 @@
 
             const tx = db.transaction("rules", "readonly"); const store = tx.objectStore("rules");
 
-            // Motor de PIM con FILTRO DE UNICIDAD para evitar repeticiones (Caso Meloxicam)
             seleccionados.forEach(m => {
-                // Filtramos variaciones únicas para que códigos cortos (ej. M01A) no repitan la búsqueda
                 const variaciones = [...new Set([m.atc, m.atc.substring(0,5), m.atc.substring(0,4)])];
                 variaciones.forEach(c => {
                     const rPim = store.get(`${c}_${c}`);
@@ -238,7 +236,8 @@
                                 let cleanMsg = rule.msg.includes(':') ? rule.msg.split(':').slice(1).join(':').trim() : rule.msg;
                                 if(cleanMsg.toUpperCase().startsWith(m.name)) cleanMsg = cleanMsg.substring(m.name.length).trim();
                                 final_beers.push({ meds: m.name, desc: cleanMsg, act: rule.act });
-                                rB.innerHTML += `<div class="mb-2 border-b pb-1"><b>${m.name}</b>: ${cleanMsg}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span></div>`;
+                                const qUrl = `https://www.google.com/search?q=${encodeURIComponent(m.name + " " + cleanMsg)}`;
+                                rB.innerHTML += `<div class="mb-2 border-b pb-1"><b>${m.name}</b>: ${cleanMsg}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span><a href="${qUrl}" target="_blank" class="info-btn">ℹ️</a></div>`;
                                 document.getElementById('boxBeers').classList.remove('hidden');
                             }
                         }
@@ -257,7 +256,8 @@
                             intDetectadas.add(id);
                             const clinicalDesc = rule.msg.includes(':') ? rule.msg.split(':').slice(1).join(':').trim() : rule.msg;
                             const pairNames = `${seleccionados[i].name} + ${seleccionados[j].name}`;
-                            const content = `<div class="mb-2 border-b pb-1"><b>${pairNames}</b>: ${clinicalDesc}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span></div>`;
+                            const qUrl = `https://www.google.com/search?q=${encodeURIComponent(pairNames + " " + clinicalDesc)}`;
+                            const content = `<div class="mb-2 border-b pb-1"><b>${pairNames}</b>: ${clinicalDesc}<br><span class="italic font-bold text-[9px]">Acción: ${rule.act}</span><a href="${qUrl}" target="_blank" class="info-btn">ℹ️</a></div>`;
                             
                             const actU = rule.act.toUpperCase();
                             if(actU.includes("EVITAR") || rule.msg.toUpperCase().includes("GRAVE")) {
