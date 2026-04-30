@@ -25,7 +25,6 @@
 </head>
 <body class="min-h-screen pb-32">
 
-    <!-- Modales Informativos -->
     <div id="infoModal" class="modal">
         <div class="modal-content">
             <button onclick="cerrarModal()" class="absolute top-4 right-4 text-slate-400 font-bold">✕</button>
@@ -34,7 +33,6 @@
         </div>
     </div>
 
-    <!-- Pantalla de Bienvenida -->
     <div id="welcomeScreen" class="fixed inset-0 bg-slate-900 flex items-center justify-center p-4 z-[9999]">
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
             <div class="bg-slate-800 p-6 text-white text-center border-b-4 border-emerald-500">
@@ -58,7 +56,6 @@
     </header>
 
     <main class="p-4 space-y-6">
-        <!-- Navegación Informativa -->
         <div class="grid grid-cols-2 gap-2">
             <button onclick="abrirModal('Información')" class="bg-slate-200 text-slate-700 py-2 rounded-xl text-[9px] font-black uppercase">Información</button>
             <button onclick="abrirModal('Aviso Legal')" class="bg-slate-200 text-slate-700 py-2 rounded-xl text-[9px] font-black uppercase">Aviso Legal</button>
@@ -71,8 +68,8 @@
             <div class="grid grid-cols-1 gap-4">
                 <div><label>Paciente (Nombre, Alias o Iniciales)</label><input type="text" id="pNombre" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="EJ. J.P."></div>
                 <div class="flex gap-2">
-                    <div class="flex-1"><label>Edad</label><input type="number" id="pEdad" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black outline-none" placeholder="AÑOS"></div>
-                    <div class="flex-2 w-full"><label>Responsable del análisis</label><input type="text" id="pResp" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="NOMBRE"></div>
+                    <div class="w-32"><label>Edad</label><input type="number" id="pEdad" class="w-full bg-slate-100 rounded-xl p-3 text-base font-black outline-none" placeholder="AÑOS"></div>
+                    <div class="flex-1"><label>Responsable del análisis</label><input type="text" id="pResp" class="w-full bg-slate-100 rounded-xl p-3 text-xs font-black uppercase outline-none" placeholder="NOMBRE"></div>
                 </div>
             </div>
         </section>
@@ -145,15 +142,13 @@
             const countRequest = store.count();
             countRequest.onsuccess = async () => {
                 if (countRequest.result === 0) {
-                    document.getElementById('status').innerText = "Instalando base de datos...";
+                    document.getElementById('status').innerText = "Cargando base de datos...";
                     document.getElementById('btnAnalizar').classList.add('btn-disabled');
                     try {
                         const resMeds = await fetch('Catalogo de farmacos_v95.csv');
                         if (resMeds.ok) await cargarMedsDesdeTexto(await resMeds.text());
-
                         const resRules = await fetch('Reglas de Interacciones_v95.csv');
                         if (resRules.ok) await cargarRulesDesdeTexto(await resRules.text());
-                        
                         setTimeout(actualizarEstadoUI, 1000);
                     } catch (err) {
                         document.getElementById('status').innerText = "Carga manual requerida";
@@ -332,7 +327,7 @@
                 const pW = doc.internal.pageSize.getWidth(); const pH = doc.internal.pageSize.getHeight();
                 let pac = (document.getElementById('pNombre').value || "ANÓNIMO").toUpperCase();
                 let resp = (document.getElementById('pResp').value || "FARMACÉUTICO").toUpperCase();
-                const legal = "Aviso: Esta herramienta es un apoyo a la decisión clínica. Los resultados son sugerencias sustentadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.";
+                const legal = "Aviso: Esta herramienta es un apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.";
 
                 doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 40, 'F');
                 doc.setTextColor(16, 185, 129); doc.setFontSize(18); doc.setFont("helvetica", "bold"); doc.text("REPORTE DE FARMACOVIGILANCIA", 15, 20);
