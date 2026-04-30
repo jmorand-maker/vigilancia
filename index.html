@@ -246,6 +246,7 @@
             document.getElementById('resultados').classList.remove('hidden');
             document.getElementById('btnPdf').classList.remove('hidden');
             document.querySelectorAll('[id^="box"]').forEach(b => b.classList.add('hidden'));
+            
             const rD = document.getElementById('resDup'); rD.innerHTML = ""; 
             const rIMaj = document.getElementById('resIntMajor'); rIMaj.innerHTML = "";
             const rIMod = document.getElementById('resIntMod'); rIMod.innerHTML = "";
@@ -255,6 +256,34 @@
 
             final_dup = []; final_int = []; final_beers = []; flagTriple = false;
             let intDetectadas = new Set(); 
+            let grps = {};
+            let diureticosEncontrados = [];
+            let ainesEncontrados = [];
+            let estatinasEncontradas = [];
+
+            seleccionados.forEach(m => {
+                let p = m.atc.substring(0, 4);
+                if (!grps[p]) grps[p] = [];
+                grps[p].push(m.name);
+
+                if (m.atc.startsWith("C03") || m.atc.startsWith("C09BA") || m.atc.startsWith("C09DA") || m.atc.startsWith("C09DB") || m.atc.startsWith("C09DX") || m.atc.startsWith("C07B") || m.atc.startsWith("C08G")) diureticosEncontrados.push(m.name);
+                if (m.atc.startsWith("M01A") || m.atc.startsWith("M01B")) ainesEncontrados.push(m.name);
+                if (m.atc.startsWith("C10AA") || m.atc.startsWith("C10B")) estatinasEncontradas.push(m.name);
+            });
+
+            // Duplicidades Estándar
+            for (let p in grps) {
+                if (grps[p].length > 1) {
+                    final_dup.push({ grp: p, meds: grps[p] });
+                    rD.innerHTML += `<p class="mb-1">• GRUPO ${p}: ${grps[p].join(' + ')}</p>`;
+                    document.getElementById('boxDup').classList.remove('hidden');
+                }
+            }
+
+            // Alertas Graves Transversales
+            if (diureticosEncontrados.length > 1) agregarAlertaGrave(diureticosEncontrados.join(' + '), "Uso concomitante de múltiples agentes diuréticos. Riesgo elevado de deshidratación, hipotensión severa y falla renal aguda.", "EVITAR");
+            if (ainesEncontrados.length > 1) agregarAlertaGrave(ainesEncontrados.join(' + '), "Uso concomitante de múltiples AINES. Aumenta significativamente el riesgo de hemorragia gastrointestinal y nefrotoxicidad.", "EVITAR");
+            if (estatinasEncontradas.length > 1) agregarAlertaGrave(estatinasEncontradas.join(' + '), "Uso concomitante de múltiples estatinas. Riesgo incrementado de miopatía, rabdomiólisis y hepatotoxicidad.", "EVITAR");
 
             // Triple Whammy
             const mAine = seleccionados.filter(m => m.atc.startsWith("M01A"));
@@ -265,10 +294,6 @@
                 document.getElementById('alertaTriple').innerHTML = `<div class="p-4 bg-red-600 text-white rounded-3xl mb-4 text-center font-black text-[10px]">🚨 ALERTA: TRIPLE WHAMMY DETECTADO<br><span class="text-[8px] uppercase">${tMeds}</span></div>`; 
                 document.getElementById('alertaTriple').classList.remove('hidden');
             }
-
-            let grps = {};
-            seleccionados.forEach(m => { let p = m.atc.substring(0,4); if(!grps[p]) grps[p]=[]; grps[p].push(m.name); });
-            for(let p in grps) { if(grps[p].length > 1) { final_dup.push({ grp: p, meds: grps[p] }); rD.innerHTML += `<p class="mb-1">• GRUPO ${p}: ${grps[p].join(' + ')}</p>`; document.getElementById('boxDup').classList.remove('hidden'); } }
 
             const tx = db.transaction("rules", "readonly"); const store = tx.objectStore("rules");
 
@@ -319,6 +344,14 @@
                     };
                 }
             }
+        }
+
+        function agregarAlertaGrave(meds, desc, accion) {
+            final_int.push({ meds: meds, desc: desc, act: accion, type: "GRAVE" });
+            const qUrl = `https://www.google.com/search?q=${encodeURIComponent(meds + " " + desc)}`;
+            const content = `<div class="mb-2 border-b pb-1 text-red-700 font-bold"><b>${meds}</b>: ${desc}<br><span class="italic font-black text-[9px]">Acción: ${accion}</span><a href="${qUrl}" target="_blank" class="info-btn">ℹ️</a></div>`;
+            document.getElementById('resIntMajor').innerHTML += content;
+            document.getElementById('boxIntMajor').classList.remove('hidden');
         }
 
         function descargarReporte() {
