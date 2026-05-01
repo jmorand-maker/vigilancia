@@ -37,7 +37,7 @@
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl border-4 border-emerald-500 flex flex-col overflow-hidden">
             <div class="bg-slate-800 p-6 text-white text-center border-b-4 border-emerald-500">
                 <h1 class="text-lg font-black italic text-emerald-400 uppercase leading-tight">Duplicidades e Interacciones Farmacológicas</h1>
-                <p class="text-[10px] uppercase font-bold mt-1">Ver. 1.0</p>
+                <p class="text-[10px] uppercase font-bold mt-1">Ver. 1.1</p>
             </div>
             <div class="p-8 space-y-4 text-justify text-[11.5px] text-slate-800 font-medium">
                 <p class="font-black text-red-600 text-center uppercase border-b pb-2">Aviso de Advertencia</p>
@@ -50,7 +50,7 @@
     <header class="bg-slate-900 text-white p-5 shadow-xl border-b-4 border-emerald-500 sticky top-0 z-50 flex justify-between items-center">
         <div>
             <h1 class="font-black uppercase italic text-[10px] text-emerald-400 leading-none">Duplicidades e Interacciones</h1>
-            <p class="text-[8px] font-bold text-slate-400 mt-1 uppercase">Ver. 1.0</p>
+            <p class="text-[8px] font-bold text-slate-400 mt-1 uppercase">Ver. 1.1</p>
         </div>
         <div id="status" class="text-[9px] font-black px-3 py-1 rounded-full bg-slate-800 text-slate-400 italic">Iniciando...</div>
     </header>
@@ -117,8 +117,8 @@
             'Información': 'Duplicidades e Interacciones farmacológicas es una aplicación informática que detecta riesgos farmacológicos, incluyendo de forma especial el Triple Whammy. También detecta Medicamentos Potencialmente Inapropiados (PIM) en pacientes de 65 años o mayores.<br><br>Se incluyen 1,001 fármacos y sus combinaciones, con un total de 95,695 interacciones.',
             'Aviso Legal': 'Esta es una herramienta de apoyo a la decisión clínica. Los resultados son sugerencias sustentadas en bases de datos farmacológicas y deben ser validados mediante el juicio profesional.<br><br>Al utilizar nuestro servicio, nos deslinda de cualquier responsabilidad por la utilización de la información.',
             'Términos': 'El usuario puede utilizar la información para su ejercicio profesional. Queda prohibido reproducir o modificar parte o todos los contenidos de la aplicación.',
-            'Privacidad': 'La aplicación no almacena ni comparte los datos capturados. Usted es libre de elegir si genera el reporte con el nombre, iniciales o alias del paciente. Toda información capturada se borra al analizar una nueva prescripción o al cerrar la aplicación.',
-            'Contacto': 'Sugerencias o problemas:<br><br>duplicidades.interacc@gmail.com'
+            'Privacidad': 'La aplicación no almacena ni comparte los datos capturados. Toda información capturada se borra al analizar una nueva prescripción o al cerrar la aplicación.',
+            'Contacto': 'Sugerencias o problemas:<br><br><b>duplicidades.interacc@gmail.com</b>'
         };
 
         const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -271,7 +271,6 @@
                 if (m.atc.startsWith("C10AA") || m.atc.startsWith("C10B")) estatinasEncontradas.push(m.name);
             });
 
-            // Duplicidades Estándar
             for (let p in grps) {
                 if (grps[p].length > 1) {
                     final_dup.push({ grp: p, meds: grps[p] });
@@ -280,12 +279,10 @@
                 }
             }
 
-            // Alertas Graves Transversales
             if (diureticosEncontrados.length > 1) agregarAlertaGrave(diureticosEncontrados.join(' + '), "Uso concomitante de múltiples agentes diuréticos. Riesgo elevado de deshidratación, hipotensión severa y falla renal aguda.", "EVITAR");
             if (ainesEncontrados.length > 1) agregarAlertaGrave(ainesEncontrados.join(' + '), "Uso concomitante de múltiples AINES. Aumenta significativamente el riesgo de hemorragia gastrointestinal y nefrotoxicidad.", "EVITAR");
             if (estatinasEncontradas.length > 1) agregarAlertaGrave(estatinasEncontradas.join(' + '), "Uso concomitante de múltiples estatinas. Riesgo incrementado de miopatía, rabdomiólisis y hepatotoxicidad.", "EVITAR");
 
-            // Triple Whammy
             const mAine = seleccionados.filter(m => m.atc.startsWith("M01A"));
             const mRaas = seleccionados.filter(m => m.atc.startsWith("C09"));
             const mDiur = seleccionados.filter(m => m.atc.startsWith("C03") || m.atc.includes("C09BA") || m.atc.includes("C09DA"));
@@ -360,7 +357,7 @@
                 const pW = doc.internal.pageSize.getWidth(); const pH = doc.internal.pageSize.getHeight();
                 let pac = (document.getElementById('pNombre').value || "ANÓNIMO").toUpperCase();
                 let resp = (document.getElementById('pResp').value || "FARMACÉUTICO").toUpperCase();
-                const legal = "Aviso: Esta herramienta es un apoyo a la decisión clínica. Los resultados son sugerencias basadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.";
+                const legal = "Aviso: Esta herramienta es un apoyo a la decisión clínica. Los resultados son sugerencias sustentadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.";
 
                 doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 40, 'F');
                 doc.setTextColor(16, 185, 129); doc.setFontSize(18); doc.setFont("helvetica", "bold"); doc.text("REPORTE DE FARMACOVIGILANCIA", 15, 20);
@@ -369,10 +366,24 @@
                 doc.text(`Responsable del análisis: ${resp}`, 15, 35);
                 
                 let curY = 45;
-                doc.autoTable({ startY: curY, head: [['RESUMEN ESTRATÉGICO', 'RESULTADO']], body: [['FÁRMACOS', seleccionados.length], ['INTERACCIONES GRAVES', final_int.filter(i=>i.type==="GRAVE").length], ['INTERACCIONES MODERADAS', final_int.filter(i=>i.type==="MODERADA").length], ['INTERACCIONES LEVES', final_int.filter(i=>i.type==="LEVE").length], ['DUPLICIDADES', final_dup.length], ['TRIPLE WHAMMY', flagTriple ? 'SÍ' : 'NO'], ['PIM (BEERS)', final_beers.length]], theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [30, 41, 59] } });
+                doc.autoTable({ 
+                    startY: curY, 
+                    head: [['RESUMEN ESTRATÉGICO', 'RESULTADO']], 
+                    body: [['FÁRMACOS', seleccionados.length], ['INTERACCIONES GRAVES', final_int.filter(i=>i.type==="GRAVE").length], ['INTERACCIONES MODERADAS', final_int.filter(i=>i.type==="MODERADA").length], ['INTERACCIONES LEVES', final_int.filter(i=>i.type==="LEVE").length], ['DUPLICIDADES', final_dup.length], ['TRIPLE WHAMMY', flagTriple ? 'SÍ' : 'NO'], ['PIM (BEERS)', final_beers.length]], 
+                    theme: 'grid', styles: { fontSize: 8 }, 
+                    headStyles: { fillColor: [30, 41, 59] },
+                    margin: { bottom: 55 }
+                });
 
                 curY = doc.lastAutoTable.finalY + 10;
-                doc.autoTable({ startY: curY, head: [['LISTADO DE FÁRMACOS', 'ATC']], body: seleccionados.map(m => [m.name, m.atc]), headStyles: { fillColor: [71, 85, 105] }, styles: { fontSize: 7 } });
+                doc.autoTable({ 
+                    startY: curY, 
+                    head: [['LISTADO DE FÁRMACOS', 'ATC']], 
+                    body: seleccionados.map(m => [m.name, m.atc]), 
+                    headStyles: { fillColor: [71, 85, 105] }, 
+                    styles: { fontSize: 7 },
+                    margin: { bottom: 55 }
+                });
                 curY = doc.lastAutoTable.finalY + 15;
 
                 const secciones = [
@@ -388,21 +399,41 @@
                     if(s.d.length > 0) {
                         if (curY > pH - 65) { doc.addPage(); curY = 20; }
                         doc.setFontSize(10); doc.setTextColor(s.c[0], s.c[1], s.c[2]); doc.text(s.t, 15, curY);
-                        doc.autoTable({ startY: curY + 4, head: [['DESCRIPCIÓN', 'ACCIÓN']], body: s.d.map(i => [i.m, i.a]), headStyles: {fillColor: s.c}, styles: {fontSize: 7} });
+                        doc.autoTable({ 
+                            startY: curY + 4, 
+                            head: [['DESCRIPCIÓN', 'ACCIÓN']], 
+                            body: s.d.map(i => [i.m, i.a]), 
+                            headStyles: {fillColor: s.c}, 
+                            styles: {fontSize: 7},
+                            margin: { bottom: 55 }
+                        });
                         curY = doc.lastAutoTable.finalY + 12;
                     }
                 });
 
-                if (curY > pH - 65) doc.addPage(), curY = 20;
-                doc.setDrawColor(30, 41, 59); doc.line(pW/2 - 40, curY + 25, pW/2 + 40, curY + 25);
-                doc.setTextColor(30, 41, 59); doc.setFontSize(8); doc.text("FIRMA DEL RESPONSABLE", pW/2, curY + 30, { align: "center" });
-
                 const totalPages = doc.internal.getNumberOfPages();
                 for (let i = 1; i <= totalPages; i++) {
-                    doc.setPage(i); doc.setFontSize(6); doc.setTextColor(100);
+                    doc.setPage(i); 
+                    
+                    // Solo dibujar firma en la última página si hay espacio, o en una nueva
+                    if (i === totalPages) {
+                        let signY = doc.lastAutoTable.finalY + 15;
+                        if (signY > pH - 65) {
+                            doc.addPage();
+                            signY = 30;
+                        }
+                        doc.setDrawColor(30, 41, 59); 
+                        doc.line(pW/2 - 40, signY + 15, pW/2 + 40, signY + 15);
+                        doc.setTextColor(30, 41, 59); doc.setFontSize(8); 
+                        doc.text("FIRMA DEL RESPONSABLE", pW/2, signY + 20, { align: "center" });
+                    }
+
+                    // Pie de página legal (invariable en todas las páginas)
+                    doc.setFontSize(6); doc.setTextColor(100);
+                    doc.setDrawColor(220);
                     doc.line(15, pH - 35, pW - 15, pH - 35);
                     doc.text(legal, 15, pH - 28, { maxWidth: pW - 40 });
-                    doc.text(`Página ${i} de ${totalPages}`, pW - 20, pH - 15, { align: "right" });
+                    doc.text(`Página ${i} de ${doc.internal.getNumberOfPages()}`, pW - 20, pH - 15, { align: "right" });
                 }
                 doc.save(`Reporte_${pac}.pdf`);
             } catch(e) { alert("Error PDF: " + e.message); }
