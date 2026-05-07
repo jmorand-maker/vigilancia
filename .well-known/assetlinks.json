@@ -2,7 +2,7 @@
       "relation": ["delegate_permission/common.handle_all_urls"],
       "target": {
         "namespace": "android_app",
-        "package_name": "com.github.twa",
-        "sha256_cert_fingerprints": ["C1:5F:A2:2D:B8:78:0C:38:B6:27:EC:F3:5E:7C:E9:D9:2D:BC:C0:E8:99:2A:EA:B2:7A:BC:EE:BA:8D:A8:1F:58"]
+        "package_name": "io.github.jmorand_maker.twa",
+        "sha256_cert_fingerprints": ["60:C4:9B:46:61:8C:96:3D:91:38:10:D8:6E:C8:33:07:BC:56:CC:7D:8C:07:14:FE:41:3E:40:01:03:07:85:FB"]
       }
     }]
