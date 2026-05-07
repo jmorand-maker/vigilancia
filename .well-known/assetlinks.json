@@ -1,12 +1,8 @@
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "PON_AQUÍ_TU_ID_DE_PAQUETE",
-      "sha256_cert_fingerprints": [
-        "PON_AQUÍ_TU_FIRMA_SHA256"
-      ]
-    }
-  }
-]
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.github.twa",
+        "sha256_cert_fingerprints": ["C1:5F:A2:2D:B8:78:0C:38:B6:27:EC:F3:5E:7C:E9:D9:2D:BC:C0:E8:99:2A:EA:B2:7A:BC:EE:BA:8D:A8:1F:58"]
+      }
+    }]
