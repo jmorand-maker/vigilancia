@@ -1,8 +1,12 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.tu_usuario.vigilancia",
-    "sha256_cert_fingerprints": ["TU_FINGERPRINT_AQUI"]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "PON_AQUÍ_TU_ID_DE_PAQUETE",
+      "sha256_cert_fingerprints": [
+        "PON_AQUÍ_TU_FIRMA_SHA256"
+      ]
+    }
   }
-}]
+]
