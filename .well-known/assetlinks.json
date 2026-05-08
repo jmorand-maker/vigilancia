@@ -1,8 +1,10 @@
 [{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "io.github.jmorand_maker.twa",
-        "sha256_cert_fingerprints": ["60:C4:9B:46:61:8C:96:3D:91:38:10:D8:6E:C8:33:07:BC:56:CC:7D:8C:07:14:FE:41:3E:40:01:03:07:85:FB"]
-      }
-    }]
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.joseausenciomoran.duplicidade",
+    "sha256_cert_fingerprints": [
+      "60:C4:9B:46:61:8C:96:3D:91:38:10:D8:6E:C8:33:07:BC:56:CC:7D:8C:07:14:FE:41:3E:40:01:03:07:85:FB"
+    ]
+  }
+}]
