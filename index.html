@@ -352,92 +352,123 @@
         }
 
         function descargarReporte() {
-            try {
-                const { jsPDF } = window.jspdf; const doc = new jsPDF({ format: 'letter' });
-                const pW = doc.internal.pageSize.getWidth(); const pH = doc.internal.pageSize.getHeight();
-                let pac = (document.getElementById('pNombre').value || "ANÓNIMO").toUpperCase();
-                let resp = (document.getElementById('pResp').value || "FARMACÉUTICO").toUpperCase();
-                const legal = "Aviso: Esta herramienta es un apoyo a la decisión clínica. Los resultados son sugerencias sustentadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.";
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ format: 'letter' });
+        const pW = doc.internal.pageSize.getWidth();
+        const pH = doc.internal.pageSize.getHeight();
+        
+        let pac = (document.getElementById('pNombre').value || "ANÓNIMO").toUpperCase();
+        let resp = (document.getElementById('pResp').value || "FARMACÉUTICO").toUpperCase();
+        const legal = "Aviso: Esta herramienta es un apoyo a la decisión clínica. Los resultados son sugerencias sustentadas en bases de datos farmacológicas y deben ser validados mediante el juicio del médico tratante.";
 
-                doc.setFillColor(15, 23, 42); doc.rect(0, 0, pW, 40, 'F');
-                doc.setTextColor(16, 185, 129); doc.setFontSize(18); doc.setFont("helvetica", "bold"); doc.text("REPORTE DE DUPLICIDADES E INTERACCIONES", 15, 20);
-                doc.setTextColor(255); doc.setFontSize(8); 
-                doc.text(`Paciente: ${pac} | Edad: ${document.getElementById('pEdad').value || "--"} años | Fecha: ${new Date().toLocaleDateString()}`, 15, 30);
-                doc.text(`Responsable del análisis: ${resp}`, 15, 35);
+        // --- CABECERA ---
+        doc.setFillColor(15, 23, 42); 
+        doc.rect(0, 0, pW, 40, 'F');
+        doc.setTextColor(16, 185, 129); 
+        doc.setFontSize(18); 
+        doc.setFont("helvetica", "bold"); 
+        doc.text("REPORTE DE DUPLICIDADES E INTERACCIONES", 15, 20);
+        doc.setTextColor(255); 
+        doc.setFontSize(8); 
+        doc.text(`Paciente: ${pac} | Edad: ${document.getElementById('pEdad').value || "--"} años | Fecha: ${new Date().toLocaleDateString()}`, 15, 30);
+        doc.text(`Responsable del análisis: ${resp}`, 15, 35);
+        
+        // --- RESUMEN ESTRATÉGICO ---
+        let curY = 45;
+        doc.autoTable({ 
+            startY: curY, 
+            head: [['RESUMEN ESTRATÉGICO', 'RESULTADO']], 
+            body: [
+                ['FÁRMACOS', seleccionados.length], 
+                ['INTERACCIONES GRAVES', final_int.filter(i=>i.type==="GRAVE").length], 
+                ['INTERACCIONES MODERADAS', final_int.filter(i=>i.type==="MODERADA").length], 
+                ['INTERACCIONES LEVES', final_int.filter(i=>i.type==="LEVE").length], 
+                ['DUPLICIDADES', final_dup.length], 
+                ['TRIPLE WHAMMY', flagTriple ? 'SÍ' : 'NO'], 
+                ['PIM (BEERS)', final_beers.length]
+            ], 
+            theme: 'grid', 
+            styles: { fontSize: 8 }, 
+            headStyles: { fillColor: [30, 41, 59] },
+            margin: { bottom: 60 }
+        });
+
+        // --- LISTADO DE FÁRMACOS ---
+        curY = doc.lastAutoTable.finalY + 10;
+        doc.autoTable({ 
+            startY: curY, 
+            head: [['LISTADO DE FÁRMACOS', 'ATC']], 
+            body: seleccionados.map(m => [m.name, m.atc]), 
+            headStyles: { fillColor: [71, 85, 105] }, 
+            styles: { fontSize: 7 },
+            margin: { bottom: 60 }
+        });
+        curY = doc.lastAutoTable.finalY + 15;
+
+        // --- SECCIONES DE RIESGO ---
+        const secciones = [
+            { t: "ALERTA: TRIPLE WHAMMY", d: flagTriple ? [{m: tMeds, a: "EVITAR"}] : [], c: [185, 28, 28] },
+            { t: "DUPLICIDAD TERAPÉUTICA", d: final_dup.map(d=>({m: d.meds.join(' + '), a: `Grupo ${d.grp}`})), c: [217, 119, 6] },
+            { t: "CRITERIOS GERIÁTRICOS (PIM)", d: final_beers.map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [37, 99, 235] },
+            { t: "INTERACCIONES GRAVES", d: final_int.filter(i=>i.type==="GRAVE").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [185, 28, 28] },
+            { t: "INTERACCIONES MODERADAS", d: final_int.filter(i=>i.type==="MODERADA").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [202, 138, 4] },
+            { t: "INTERACCIONES LEVES", d: final_int.filter(i=>i.type==="LEVE").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [16, 185, 129] }
+        ];
+
+        secciones.forEach(s => {
+            if(s.d.length > 0) {
+                // Si queda poco espacio para el título y al menos una fila, saltamos de página
+                if (curY > pH - 85) { doc.addPage(); curY = 25; }
+                doc.setFontSize(10); 
+                doc.setTextColor(s.c[0], s.c[1], s.c[2]); 
+                doc.text(s.t, 15, curY);
                 
-                let curY = 45;
                 doc.autoTable({ 
-                    startY: curY, 
-                    head: [['RESUMEN ESTRATÉGICO', 'RESULTADO']], 
-                    body: [['FÁRMACOS', seleccionados.length], ['INTERACCIONES GRAVES', final_int.filter(i=>i.type==="GRAVE").length], ['INTERACCIONES MODERADAS', final_int.filter(i=>i.type==="MODERADA").length], ['INTERACCIONES LEVES', final_int.filter(i=>i.type==="LEVE").length], ['DUPLICIDADES', final_dup.length], ['TRIPLE WHAMMY', flagTriple ? 'SÍ' : 'NO'], ['PIM (BEERS)', final_beers.length]], 
-                    theme: 'grid', styles: { fontSize: 8 }, 
-                    headStyles: { fillColor: [30, 41, 59] },
-                    margin: { bottom: 55 }
-                });
-
-                curY = doc.lastAutoTable.finalY + 10;
-                doc.autoTable({ 
-                    startY: curY, 
-                    head: [['LISTADO DE FÁRMACOS', 'ATC']], 
-                    body: seleccionados.map(m => [m.name, m.atc]), 
-                    headStyles: { fillColor: [71, 85, 105] }, 
+                    startY: curY + 4, 
+                    head: [['DESCRIPCIÓN', 'ACCIÓN']], 
+                    body: s.d.map(i => [i.m, i.a]), 
+                    headStyles: { fillColor: s.c }, 
                     styles: { fontSize: 7 },
-                    margin: { bottom: 55 }
+                    margin: { bottom: 60 } // Margen amplio para el pie de página
                 });
                 curY = doc.lastAutoTable.finalY + 15;
+            }
+        });
 
-                const secciones = [
-                    { t: "ALERTA: TRIPLE WHAMMY", d: flagTriple ? [{m: tMeds, a: "EVITAR"}] : [], c: [185, 28, 28] },
-                    { t: "DUPLICIDAD TERAPEUTICA", d: final_dup.map(d=>({m: d.meds.join(' + '), a: `Grupo ${d.grp}`})), c: [217, 119, 6] },
-                    { t: "CRITERIOS GERIATRICOS (PIM)", d: final_beers.map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [37, 99, 235] },
-                    { t: "INTERACCIONES GRAVES", d: final_int.filter(i=>i.type==="GRAVE").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [185, 28, 28] },
-                    { t: "INTERACCIONES MODERADAS", d: final_int.filter(i=>i.type==="MODERADA").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [202, 138, 4] },
-                    { t: "INTERACCIONES LEVES", d: final_int.filter(i=>i.type==="LEVE").map(i=>({m: i.meds + ": " + i.desc, a: i.act})), c: [16, 185, 129] }
-                ];
-
-                secciones.forEach(s => {
-                    if(s.d.length > 0) {
-                        if (curY > pH - 65) { doc.addPage(); curY = 20; }
-                        doc.setFontSize(10); doc.setTextColor(s.c[0], s.c[1], s.c[2]); doc.text(s.t, 15, curY);
-                        doc.autoTable({ 
-                            startY: curY + 4, 
-                            head: [['DESCRIPCIÓN', 'ACCIÓN']], 
-                            body: s.d.map(i => [i.m, i.a]), 
-                            headStyles: {fillColor: s.c}, 
-                            styles: {fontSize: 7},
-                            margin: { bottom: 55 }
-                        });
-                        curY = doc.lastAutoTable.finalY + 12;
-                    }
-                });
-
-                const totalPages = doc.internal.getNumberOfPages();
-                for (let i = 1; i <= totalPages; i++) {
-                    doc.setPage(i); 
-                    
-                    // Solo dibujar firma en la última página si hay espacio, o en una nueva
-                    if (i === totalPages) {
-                        let signY = doc.lastAutoTable.finalY + 15;
-                        if (signY > pH - 65) {
-                            doc.addPage();
-                            signY = 30;
-                        }
-                        doc.setDrawColor(30, 41, 59); 
-                        doc.line(pW/2 - 40, signY + 15, pW/2 + 40, signY + 15);
-                        doc.setTextColor(30, 41, 59); doc.setFontSize(8); 
-                        doc.text("FIRMA DEL RESPONSABLE", pW/2, signY + 20, { align: "center" });
-                    }
-
-                    // Pie de página legal (invariable en todas las páginas)
-                    doc.setFontSize(6); doc.setTextColor(100);
-                    doc.setDrawColor(220);
-                    doc.line(15, pH - 35, pW - 15, pH - 35);
-                    doc.text(legal, 15, pH - 28, { maxWidth: pW - 40 });
-                    doc.text(`Página ${i} de ${doc.internal.getNumberOfPages()}`, pW - 20, pH - 15, { align: "right" });
-                }
-                doc.save(`Reporte_${pac}.pdf`);
-            } catch(e) { alert("Error PDF: " + e.message); }
+        // --- MANEJO DE FIRMA (Fuera del loop para evitar errores de conteo) ---
+        let signY = doc.lastAutoTable.finalY + 20;
+        if (signY > pH - 70) {
+            doc.addPage();
+            signY = 35;
         }
+        doc.setDrawColor(30, 41, 59); 
+        doc.line(pW/2 - 40, signY + 15, pW/2 + 40, signY + 15);
+        doc.setTextColor(30, 41, 59); 
+        doc.setFontSize(8); 
+        doc.text("FIRMA DEL RESPONSABLE", pW/2, signY + 20, { align: "center" });
+
+        // --- SELLO FINAL DE TODAS LAS PÁGINAS (Headers/Footers) ---
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i); 
+            doc.setFontSize(6); 
+            doc.setTextColor(100);
+            doc.setDrawColor(220);
+            // Línea divisoria del pie
+            doc.line(15, pH - 35, pW - 15, pH - 35);
+            // Aviso legal
+            doc.text(legal, 15, pH - 28, { maxWidth: pW - 40 });
+            // Número de página
+            doc.text(`Página ${i} de ${totalPages}`, pW - 20, pH - 15, { align: "right" });
+        }
+
+        doc.save(`Reporte_${pac}_${new Date().getTime()}.pdf`);
+    } catch(e) { 
+        console.error(e);
+        alert("Error al generar el PDF. Por favor intente de nuevo."); 
+    }
+}
 // Registro del Service Worker para funcionamiento Offline
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
