@@ -1,6 +1,6 @@
 {
   "name": "Duplicidades e Interacciones Farmacológicas",
-  "short_name": "Duplicidades e Interacciones",
+  "short_name": "Interacciones",
   "description": "Herramienta profesional para la detección de riesgos farmacológicos, duplicidades y criterios PIM.",
   "start_url": "./index.html",
   "display": "standalone",
