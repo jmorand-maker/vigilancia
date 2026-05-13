@@ -1,10 +1,8 @@
 [{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.joseausenciomoran.duplicidade",
-    "sha256_cert_fingerprints": [
-      "8C:DB:90:19:21:3B:75:09:CA:D7:7D:9D:11:14:4C:0E:69:52:27:12:D9:F3:DB:2A:95:2E:87:50:50:75:D9:72"
-    ]
-  }
-}]
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.joseausenciomoran.duplicidade",
+        "sha256_cert_fingerprints": ["E3:42:4C:41:01:37:32:DE:AF:BF:EC:D6:5A:B2:5E:2D:CD:A6:FD:E9:E0:7D:28:DE:E0:FF:A7:17:41:76:07:95"]
+      }
+    }]
