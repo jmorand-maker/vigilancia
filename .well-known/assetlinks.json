@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "com.joseausenciomoran.duplicidade",
-        "sha256_cert_fingerprints": ["E3:42:4C:41:01:37:32:DE:AF:BF:EC:D6:5A:B2:5E:2D:CD:A6:FD:E9:E0:7D:28:DE:E0:FF:A7:17:41:76:07:95"]
+        "sha256_cert_fingerprints": ["08:D5:3C:04:8D:AC:7F:E1:7E:59:A4:D4:93:F2:F7:A9:B5:41:45:6A:E8:4E:07:1B:3E:09:CB:E5:81:2C:1D:F3"]
       }
     }]
